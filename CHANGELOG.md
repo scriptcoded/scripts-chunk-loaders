@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.1](https://github.com/scriptcoded/scripts-chunk-loaders/compare/v0.1.0...v0.1.1) (2023-06-10)
+
+
+### Miscellaneous Chores
+
+* release 0.1.1 ([c057d6e](https://github.com/scriptcoded/scripts-chunk-loaders/commit/c057d6eeb68813314db825b70c1ef3162261d008))
+
 ## [0.1.0](https://github.com/scriptcoded/scripts-chunk-loaders/compare/v0.0.1...v0.1.0) (2023-06-10)
 
 
