@@ -50,8 +50,8 @@ jobs:
         with:
           # Only include this section if you wish to publish
           # your assets on Modrinth.
-          # modrinth-id: ${{ vars.MODRINTH_ID }}
-          # modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+          modrinth-id: ${{ vars.MODRINTH_ID }}
+          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
 
           # Only include this section if you wish to publish
           # your assets on GitHub.
@@ -59,4 +59,3 @@ jobs:
           github-tag: ${{ needs.release.outputs.tag_name }}
 
           changelog-file: CHANGELOG.md
-  
