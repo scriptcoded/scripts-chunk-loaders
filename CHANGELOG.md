@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0](https://github.com/scriptcoded/scripts-chunk-loaders/compare/v0.1.1...v0.2.0) (2023-06-10)
+
+
+### Features
+
+* update to 1.20 ([5b25f6b](https://github.com/scriptcoded/scripts-chunk-loaders/commit/5b25f6b2cb366437234bb28d37383f172348b626))
+
 ## [0.1.1](https://github.com/scriptcoded/scripts-chunk-loaders/compare/v0.1.0...v0.1.1) (2023-06-10)
 
 
