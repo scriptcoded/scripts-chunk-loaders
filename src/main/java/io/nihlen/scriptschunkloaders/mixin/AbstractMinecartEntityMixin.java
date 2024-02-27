@@ -1,11 +1,9 @@
 package io.nihlen.scriptschunkloaders.mixin;
 
 import net.minecraft.entity.vehicle.*;
-import net.minecraft.item.AirBlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.util.Formatting;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -25,9 +23,13 @@ import net.minecraft.world.World;
 public abstract class AbstractMinecartEntityMixin extends Entity implements MinecartEntityExt {
 	@Shadow public abstract AbstractMinecartEntity.Type getMinecartType();
 
+	@Unique
 	private boolean isChunkLoader = false;
+	@Unique
 	private int particleTicker = 0;
+	@Unique
 	private final int particleInterval = 3;
+	@Unique
 	private ChunkPos lastChunkPos = null;
 
 	public AbstractMinecartEntityMixin(EntityType<?> type, World world) {
@@ -37,45 +39,46 @@ public abstract class AbstractMinecartEntityMixin extends Entity implements Mine
 	@Inject(method = "<init>(Lnet/minecraft/entity/EntityType;Lnet/minecraft/world/World;DDD)V", at = @At("TAIL"))
 	private void injectConstructor(CallbackInfo callbackInfo) {
 		if (isChunkLoader) {
-			startChunkLoader();
+			scripts_chunk_loaders$startChunkLoader();
 		}
 	}
 
-	public boolean isChunkLoader() {
+	public boolean scripts_chunk_loaders$isChunkLoader() {
 		return this.isChunkLoader;
 	}
 
-	public void startChunkLoader() {
+	public void scripts_chunk_loaders$startChunkLoader() {
+		if (this.getWorld().isClient) return;
+
 		this.isChunkLoader = true;
 
 		ScriptsChunkLoadersMod.LOGGER.info("Starting chunk loader in {}", this.getWorld().getRegistryKey().getValue());
-		//ScriptsChunkLoadersMod.CHUNK_LOADER_MANAGER.registerChunkLoader(this);
 	}
 
-	public void setChunkLoaderNameFromInventory() {
+	public void scripts_chunk_loaders$setChunkLoaderNameFromInventory() {
 		var minecartType = this.getMinecartType();
 		if (minecartType == AbstractMinecartEntity.Type.CHEST) {
+			//noinspection DataFlowIssue - We're sure this is a chest because of the if statement.
 			var entity = (ChestMinecartEntity)(Object)this;
 			var firstSlot = entity.getInventory().get(0);
 
 			if (!firstSlot.isEmpty()) {
 				var name = firstSlot.getName().getString();
-				setChunkLoaderName("To " + name);
+				scripts_chunk_loaders$setChunkLoaderName("To " + name);
 				return;
 			}
 		};
 
-		setChunkLoaderName("Chunk Loader");
+		scripts_chunk_loaders$setChunkLoaderName("Chunk Loader");
 	}
 
-	public void setChunkLoaderName(String name) {
+	public void scripts_chunk_loaders$setChunkLoaderName(String name) {
 		var nameText = Text.literal(name);
-//		nameText.formatted(Formatting.GOLD);
 		this.setCustomName(nameText);
 		this.setCustomNameVisible(true);
 	}
 
-	public void stopChunkLoader() {
+	public void scripts_chunk_loaders$stopChunkLoader() {
 		this.isChunkLoader = false;
 
 		ScriptsChunkLoadersMod.CHUNK_LOADER_MANAGER.removeChunkLoader(this);
@@ -110,9 +113,8 @@ public abstract class AbstractMinecartEntityMixin extends Entity implements Mine
 
 	@Override
 	public void remove(Entity.RemovalReason reason) {
-		ScriptsChunkLoadersMod.LOGGER.info("Removing thing from world {}", isChunkLoader);
 		if (isChunkLoader) {
-			this.stopChunkLoader();
+			this.scripts_chunk_loaders$stopChunkLoader();
 		}
 
 		super.remove(reason);
@@ -120,21 +122,21 @@ public abstract class AbstractMinecartEntityMixin extends Entity implements Mine
 
 	@Override
 	public Entity moveToWorld(ServerWorld destination) {
-		ScriptsChunkLoadersMod.LOGGER.info("Moving thing to world");
 		var wasChunkLoader = isChunkLoader;
 		if (wasChunkLoader) {
-			this.stopChunkLoader();
+			this.scripts_chunk_loaders$stopChunkLoader();
 		}
 
 		var newEntity = super.moveToWorld(destination);
 
-		if (wasChunkLoader) {
-			((AbstractMinecartEntityMixin)newEntity).startChunkLoader();
+		if (wasChunkLoader && newEntity != null) {
+			((AbstractMinecartEntityMixin)newEntity).scripts_chunk_loaders$startChunkLoader();
 		}
 
 		return newEntity;
 	}
 
+	@Unique
 	private void tickParticles() {
 		this.particleTicker += 1;
 		if (this.particleTicker >= particleInterval) {
@@ -143,6 +145,7 @@ public abstract class AbstractMinecartEntityMixin extends Entity implements Mine
 		}
 	}
 
+	@Unique
 	private void spawnParticles() {
 		AbstractMinecartEntity entity = (AbstractMinecartEntity)(Object)this;
 		ServerWorld world = (ServerWorld)entity.getWorld();

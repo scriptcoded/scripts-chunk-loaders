@@ -1,13 +1,9 @@
 package io.nihlen.scriptschunkloaders;
 
-import net.minecraft.util.math.ChunkPos;
-
-import java.util.UUID;
-
 public interface MinecartEntityExt {
-    public void startChunkLoader();
-    public void stopChunkLoader();
-    public boolean isChunkLoader();
-    public void setChunkLoaderNameFromInventory();
-    public void setChunkLoaderName(String name);
+    public void scripts_chunk_loaders$startChunkLoader();
+    public void scripts_chunk_loaders$stopChunkLoader();
+    public boolean scripts_chunk_loaders$isChunkLoader();
+    public void scripts_chunk_loaders$setChunkLoaderNameFromInventory();
+    public void scripts_chunk_loaders$setChunkLoaderName(String name);
 }

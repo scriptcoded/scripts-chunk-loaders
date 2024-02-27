@@ -68,7 +68,7 @@ public class ChunkLoaderManager {
             var uuids = entry.getValue();
 
             var didRemove = uuids.remove(uuid);
-            if (didRemove && uuids.size() == 0) {
+            if (didRemove && uuids.isEmpty()) {
                 iterator.remove();
             }
         }
@@ -93,9 +93,9 @@ public class ChunkLoaderManager {
 
     private void updateChunkLoaders(ServerWorld world) {
         var currentChunks = calculateLoadedChunks(world);
-        //ScriptsChunkLoadersMod.LOGGER.info("Updating {}: {}", world.getRegistryKey().getValue(), currentChunks);
 
-        // TODO: This can probably be optimized. We're looping over the same range twice.
+        // TODO: This can probably be optimized. We're looping over the same range twice since there usually is an
+        //  overlap between the current chunks and the loaded chunks.
 
         final LongSet loadedChunks = world.getForcedChunks();
 

@@ -6,6 +6,8 @@
 	"mixins": [
 	],
 	"client": [
+		"DispenserBlockMixin",
+		"AbstractMinecartEntityMixin"
 	],
 	"server": [
 		"DispenserBlockMixin",
