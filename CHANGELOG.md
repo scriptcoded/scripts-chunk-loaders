@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.1](https://github.com/scriptcoded/scripts-chunk-loaders/compare/v0.2.0...v0.2.1) (2024-02-27)
+
+
+### Bug Fixes
+
+* cleanup and make mod run in singleplayer ([5c1e1ce](https://github.com/scriptcoded/scripts-chunk-loaders/commit/5c1e1ce6dc81c7abac513301f4be6ab555a05ee0))
+* **version:** Update to Minecraft 1.20.1 ([192702d](https://github.com/scriptcoded/scripts-chunk-loaders/commit/192702d300f4508a7549476a9a386fb3d82131b8))
+
 ## [0.2.0](https://github.com/scriptcoded/scripts-chunk-loaders/compare/v0.1.1...v0.2.0) (2023-06-10)
 
 
