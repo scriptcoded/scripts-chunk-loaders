@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.3](https://github.com/scriptcoded/scripts-chunk-loaders/compare/v0.2.2...v0.2.3) (2024-03-02)
+
+
+### Bug Fixes
+
+* disable chunk loader if already a chunk loader ([11c655a](https://github.com/scriptcoded/scripts-chunk-loaders/commit/11c655ae4a3f60618ddf1e156e0d1548c5802d1a))
+* **version:** update to Minecraft 1.20.3 ([16c4040](https://github.com/scriptcoded/scripts-chunk-loaders/commit/16c40407118483837946b74338de848026c1ba11))
+
 ## [0.2.2](https://github.com/scriptcoded/scripts-chunk-loaders/compare/v0.2.1...v0.2.2) (2024-03-02)
 
 
