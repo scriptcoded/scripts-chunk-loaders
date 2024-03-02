@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.2.4](https://github.com/scriptcoded/scripts-chunk-loaders/compare/v0.2.3...v0.2.4) (2024-03-02)
+
+
+### Bug Fixes
+
+* **version:** update to Minecraft 1.20.4 ([19a3c69](https://github.com/scriptcoded/scripts-chunk-loaders/commit/19a3c69f1d76960acd450703e79d0be7dd890251))
+
+
+### Documentation
+
+* add readme ([4548036](https://github.com/scriptcoded/scripts-chunk-loaders/commit/45480366082e72ac082e866a103aad06b2c6121a))
+
 ## [0.2.3](https://github.com/scriptcoded/scripts-chunk-loaders/compare/v0.2.2...v0.2.3) (2024-03-02)
 
 
