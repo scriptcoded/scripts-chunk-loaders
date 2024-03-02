@@ -62,9 +62,9 @@ public abstract class AbstractMinecartEntityMixin extends Entity implements Mine
 			var entity = (ChestMinecartEntity)(Object)this;
 			var firstSlot = entity.getInventory().get(0);
 
-			if (!firstSlot.isEmpty()) {
+			if (!firstSlot.isEmpty() && firstSlot.hasCustomName()) {
 				var name = firstSlot.getName().getString();
-				scripts_chunk_loaders$setChunkLoaderName("To " + name);
+				scripts_chunk_loaders$setChunkLoaderName(name);
 				return;
 			}
 		};
