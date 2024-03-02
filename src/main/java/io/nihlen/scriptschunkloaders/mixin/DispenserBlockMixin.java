@@ -52,19 +52,24 @@ public class DispenserBlockMixin {
             }
         }
 
-        this.createMinecraftChunkLoader(world, state, pos, dispenserBlockEntity);
+        this.toggleMinecraftChunkLoader(world, state, pos);
         info.cancel();
     }
 
     @Unique
-    private void createMinecraftChunkLoader(ServerWorld world, BlockState state, BlockPos pos, DispenserBlockEntity pointer) {
+    private void toggleMinecraftChunkLoader(ServerWorld world, BlockState state, BlockPos pos) {
         BlockPos blockPos = pos.offset(state.get(DispenserBlock.FACING));
         List<AbstractMinecartEntity> list = world.getEntitiesByClass(AbstractMinecartEntity.class, new Box(blockPos), EntityPredicates.VALID_ENTITY);
 
         for (AbstractMinecartEntity entity : list) {
             MinecartEntityExt cart = (MinecartEntityExt)entity;
-            cart.scripts_chunk_loaders$startChunkLoader();
-            cart.scripts_chunk_loaders$setChunkLoaderNameFromInventory();
+
+            if (cart.scripts_chunk_loaders$isChunkLoader()) {
+                cart.scripts_chunk_loaders$stopChunkLoader();
+            } else {
+                cart.scripts_chunk_loaders$startChunkLoader();
+                cart.scripts_chunk_loaders$setChunkLoaderNameFromInventory();
+            }
         }
     }
 }
