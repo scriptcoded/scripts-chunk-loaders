@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.2](https://github.com/scriptcoded/scripts-chunk-loaders/compare/v0.2.1...v0.2.2) (2024-03-02)
+
+
+### Bug Fixes
+
+* auto naming fixes ([f2e2357](https://github.com/scriptcoded/scripts-chunk-loaders/commit/f2e2357035e0044b4fdced921807c2954756ee0e))
+* **version:** update to Minecraft 1.20.2 ([d524346](https://github.com/scriptcoded/scripts-chunk-loaders/commit/d524346c19b9c8cca5b46d11ebc1f4a2e33c8e4a))
+
 ## [0.2.1](https://github.com/scriptcoded/scripts-chunk-loaders/compare/v0.2.0...v0.2.1) (2024-02-27)
 
 
