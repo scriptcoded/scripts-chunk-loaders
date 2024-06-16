@@ -1,6 +1,8 @@
 package io.nihlen.scriptschunkloaders.mixin;
 
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.vehicle.*;
+import net.minecraft.world.TeleportTarget;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
