@@ -125,15 +125,14 @@ public abstract class AbstractMinecartEntityMixin extends Entity implements Mine
 	}
 
 	@Override
-	public Entity teleportTo(TeleportTarget teleportTarget)
-	{
+	public Entity teleportTo(TeleportTarget teleportTarget) {
 		var wasChunkLoader = isChunkLoader;
-		if(wasChunkLoader)
+		if (wasChunkLoader)
 			this.scripts_chunk_loaders$stopChunkLoader();
 
 		var newEntity = super.teleportTo(teleportTarget);
 
-		if(wasChunkLoader && newEntity != null)
+		if (wasChunkLoader && newEntity != null)
 			((AbstractMinecartEntityMixin)newEntity).scripts_chunk_loaders$startChunkLoader();
 
 		return newEntity;
