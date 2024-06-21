@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.1](https://github.com/scriptcoded/scripts-chunk-loaders/compare/v0.3.0...v0.3.1) (2024-06-21)
+
+
+### Bug Fixes
+
+* use Java 21 for releases ([cb1ce9d](https://github.com/scriptcoded/scripts-chunk-loaders/commit/cb1ce9dc46d318eef45b5811629e8567fd88e101))
+
 ## [0.3.0](https://github.com/scriptcoded/scripts-chunk-loaders/compare/v0.2.4...v0.3.0) (2024-06-21)
 
 
