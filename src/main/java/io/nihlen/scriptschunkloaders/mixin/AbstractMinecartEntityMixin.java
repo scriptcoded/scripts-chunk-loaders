@@ -1,6 +1,8 @@
 package io.nihlen.scriptschunkloaders.mixin;
 
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.vehicle.*;
+import net.minecraft.world.TeleportTarget;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -62,7 +64,9 @@ public abstract class AbstractMinecartEntityMixin extends Entity implements Mine
 			var entity = (ChestMinecartEntity)(Object)this;
 			var firstSlot = entity.getInventory().get(0);
 
-			if (!firstSlot.isEmpty() && firstSlot.hasCustomName()) {
+			var hasCustomName = firstSlot.get(DataComponentTypes.CUSTOM_NAME) != null;
+			
+			if (!firstSlot.isEmpty() && hasCustomName) {
 				var name = firstSlot.getName().getString();
 				scripts_chunk_loaders$setChunkLoaderName(name);
 				return;
@@ -79,12 +83,17 @@ public abstract class AbstractMinecartEntityMixin extends Entity implements Mine
 	}
 
 	public void scripts_chunk_loaders$stopChunkLoader() {
+		scripts_chunk_loaders$stopChunkLoader(false);
+	}
+	public void scripts_chunk_loaders$stopChunkLoader(Boolean keepName) {
 		this.isChunkLoader = false;
 
 		ScriptsChunkLoadersMod.CHUNK_LOADER_MANAGER.removeChunkLoader(this);
 
-		this.setCustomName(null);
-		this.setCustomNameVisible(false);
+		if (!keepName) {
+			this.setCustomName(null);
+			this.setCustomNameVisible(false);
+		}
 	}
 
 	@Inject(method = "writeCustomDataToNbt", at = @At("RETURN"))
@@ -121,17 +130,15 @@ public abstract class AbstractMinecartEntityMixin extends Entity implements Mine
 	}
 
 	@Override
-	public Entity moveToWorld(ServerWorld destination) {
+	public Entity teleportTo(TeleportTarget teleportTarget) {
 		var wasChunkLoader = isChunkLoader;
-		if (wasChunkLoader) {
-			this.scripts_chunk_loaders$stopChunkLoader();
-		}
+		if (wasChunkLoader)
+			this.scripts_chunk_loaders$stopChunkLoader(true);
 
-		var newEntity = super.moveToWorld(destination);
+		var newEntity = super.teleportTo(teleportTarget);
 
-		if (wasChunkLoader && newEntity != null) {
+		if (wasChunkLoader && newEntity != null)
 			((AbstractMinecartEntityMixin)newEntity).scripts_chunk_loaders$startChunkLoader();
-		}
 
 		return newEntity;
 	}
