@@ -83,12 +83,17 @@ public abstract class AbstractMinecartEntityMixin extends Entity implements Mine
 	}
 
 	public void scripts_chunk_loaders$stopChunkLoader() {
+		scripts_chunk_loaders$stopChunkLoader(false);
+	}
+	public void scripts_chunk_loaders$stopChunkLoader(Boolean keepName) {
 		this.isChunkLoader = false;
 
 		ScriptsChunkLoadersMod.CHUNK_LOADER_MANAGER.removeChunkLoader(this);
 
-		this.setCustomName(null);
-		this.setCustomNameVisible(false);
+		if (!keepName) {
+			this.setCustomName(null);
+			this.setCustomNameVisible(false);
+		}
 	}
 
 	@Inject(method = "writeCustomDataToNbt", at = @At("RETURN"))
@@ -128,7 +133,7 @@ public abstract class AbstractMinecartEntityMixin extends Entity implements Mine
 	public Entity teleportTo(TeleportTarget teleportTarget) {
 		var wasChunkLoader = isChunkLoader;
 		if (wasChunkLoader)
-			this.scripts_chunk_loaders$stopChunkLoader();
+			this.scripts_chunk_loaders$stopChunkLoader(true);
 
 		var newEntity = super.teleportTo(teleportTarget);
 
