@@ -23,7 +23,6 @@ import net.minecraft.world.World;
 
 @Mixin(AbstractMinecartEntity.class)
 public abstract class AbstractMinecartEntityMixin extends Entity implements MinecartEntityExt {
-	@Shadow public abstract AbstractMinecartEntity.Type getMinecartType();
 
 	@Unique
 	private boolean isChunkLoader = false;
@@ -58,8 +57,9 @@ public abstract class AbstractMinecartEntityMixin extends Entity implements Mine
 	}
 
 	public void scripts_chunk_loaders$setChunkLoaderNameFromInventory() {
-		var minecartType = this.getMinecartType();
-		if (minecartType == AbstractMinecartEntity.Type.CHEST) {
+		EntityType<?> minecartType = this.getType();
+
+		if (minecartType == EntityType.CHEST_MINECART) {
 			//noinspection DataFlowIssue - We're sure this is a chest because of the if statement.
 			var entity = (ChestMinecartEntity)(Object)this;
 			var firstSlot = entity.getInventory().get(0);
@@ -103,7 +103,7 @@ public abstract class AbstractMinecartEntityMixin extends Entity implements Mine
 
 	@Inject(method = "readCustomDataFromNbt", at = @At("RETURN"))
 	public void readCustomDataFromNbt(NbtCompound nbt, CallbackInfo ci) {
-		this.isChunkLoader = nbt.getBoolean("chunkLoader");
+			this.isChunkLoader = nbt.getBoolean("chunkLoader").orElse(false);
 	}
 
 	@Inject(method = "tick", at = @At("TAIL"))
