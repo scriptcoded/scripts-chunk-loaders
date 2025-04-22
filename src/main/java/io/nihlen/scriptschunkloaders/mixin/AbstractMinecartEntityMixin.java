@@ -84,6 +84,7 @@ public abstract class AbstractMinecartEntityMixin extends Entity implements Mine
 
 	public void scripts_chunk_loaders$stopChunkLoader() {
 		scripts_chunk_loaders$stopChunkLoader(false);
+		this.lastChunkPos = null;
 	}
 	public void scripts_chunk_loaders$stopChunkLoader(Boolean keepName) {
 		this.isChunkLoader = false;
