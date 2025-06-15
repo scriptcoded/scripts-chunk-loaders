@@ -1,8 +1,11 @@
 {
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
   "packages": {
-    ".": {}
-  },
-  "extra-files": [
-    "gradle.properties"
-  ]
+    ".": {
+      "extra-files": [
+        "gradle.properties"
+      ],
+      "skip-snapshot": true
+    }
+  }
 }
