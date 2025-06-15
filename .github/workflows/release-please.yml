@@ -17,11 +17,11 @@ jobs:
       tag_name: ${{ steps.release.outputs.tag_name }}
     steps:
       - id: release
-        uses: google-github-actions/release-please-action@v3
+        uses: googleapis/release-please-action@v4
         with:
           release-type: java
-          extra-files: |
-            gradle.properties
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
 
   build:
     needs: release

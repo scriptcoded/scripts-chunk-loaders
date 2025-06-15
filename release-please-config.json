@@ -1,0 +1,8 @@
+{
+  "packages": {
+    ".": {}
+  },
+  "extra-files": [
+    "gradle.properties"
+  ]
+}
