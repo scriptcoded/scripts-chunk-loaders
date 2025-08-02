@@ -72,7 +72,7 @@ jobs:
           else
             echo "This pull request will trigger a new release when merged." >> $GITHUB_OUTPUT
             echo -e "<details>\n" >> $GITHUB_OUTPUT
-            echo -e "<summary>Release notes</summary>\n" >> $GITHUB_OUTPUT
+            echo -e "<summary>Release notes</summary>\n\n" >> $GITHUB_OUTPUT
             echo -e "${{ steps.dryrun.outputs.notes }}\n" >> $GITHUB_OUTPUT
             echo -e "</details>\n" >> $GITHUB_OUTPUT
           fi
