@@ -72,7 +72,7 @@ jar {
 
 modrinth {
 	token = System.getenv("MODRINTH_TOKEN")
-	projectId = "MjayL39D"
+	projectId = "scripts-chunk-loaders"
 	versionType = "release"
 	uploadFile = remapJar
 	gameVersions = [project.minecraft_version]
