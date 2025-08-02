@@ -104,7 +104,7 @@ public abstract class AbstractMinecartEntityMixin extends Entity implements Mine
 
 	@Inject(method = "readCustomDataFromNbt", at = @At("RETURN"))
 	public void readCustomDataFromNbt(NbtCompound nbt, CallbackInfo ci) {
-		this.isChunkLoader = nbt.getBoolean("chunkLoader");
+		this.isChunkLoader = nbt.getBoolean("chunkLoader").orElse(false);
 	}
 
 	@Inject(method = "tick", at = @At("TAIL"))
