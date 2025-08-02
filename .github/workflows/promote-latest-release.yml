@@ -1,0 +1,48 @@
+name: Promote Latest Release
+
+on:
+  release:
+    types: [released]
+
+jobs:
+  promote-release:
+    name: Mark highest semver as latest
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Find and mark latest release
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const semver = require('semver');
+            const { owner, repo } = context.repo;
+
+            console.log(`Fetching all releases for ${owner}/${repo}...`);
+            const { data: allReleases } = await github.rest.repos.listReleases({
+              owner,
+              repo,
+            });
+
+            const sortedReleases = allReleases
+              .filter(r => !r.draft && !r.prerelease && semver.valid(r.tag_name))
+              .sort((a, b) => semver.rcompare(a.tag_name, b.tag_name));
+
+            if (sortedReleases.length === 0) {
+              core.info("No valid, non-prerelease releases found. Exiting.");
+              return;
+            }
+
+            const latestRelease = sortedReleases[0];
+            console.log(`Highest semver release found: ${latestRelease.tag_name}`);
+
+            console.log(`Updating release ${latestRelease.tag_name} to be the new 'latest' release.`);
+            await github.rest.repos.updateRelease({
+              owner,
+              repo,
+              release_id: latestRelease.id,
+              make_latest: 'true',
+            });
+            console.log(`Successfully marked ${latestRelease.tag_name} as the latest release.`);

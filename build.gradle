@@ -1,6 +1,6 @@
 plugins {
 	id 'fabric-loom' version '1.8-SNAPSHOT'
-	id 'maven-publish'
+	id "com.modrinth.minotaur" version "2.+"
 }
 
 sourceCompatibility = JavaVersion.VERSION_21
@@ -70,19 +70,14 @@ jar {
 	}
 }
 
-// configure the maven publication
-publishing {
-	publications {
-		mavenJava(MavenPublication) {
-			from components.java
-		}
+modrinth {
+	token = System.getenv("MODRINTH_TOKEN")
+	projectId = "MjayL39D"
+	versionType = "release"
+	uploadFile = remapJar
+	gameVersions = [project.minecraft_version]
+	dependencies {
+		required.project "fabric-api"
 	}
-
-	// See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
-	repositories {
-		// Add repositories to publish to here.
-		// Notice: This block does NOT have the same function as the block in the top level.
-		// The repositories here will be used for publishing your artifact, not for
-		// retrieving dependencies.
-	}
+	changelog = System.getenv("MODRINTH_CHANGELOG")
 }

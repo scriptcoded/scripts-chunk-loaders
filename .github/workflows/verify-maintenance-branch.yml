@@ -1,0 +1,83 @@
+name: Verify Maintenance Branch
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited]
+    branches: [main, 'mc/*']
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set common variables
+        id: vars
+        run: |
+          PROPERTIES_FILE="gradle.properties"
+          MC_VERSION_REGEX='minecraft_version\s*=\s*(.+)'
+
+          NEW_MC_VERSION=$(grep -oP "$MC_VERSION_REGEX" "$PROPERTIES_FILE" | cut -d'=' -f2 | tr -d '[:space:]' || true)
+
+          if [[ -z "$NEW_MC_VERSION" ]]; then
+            echo "Could not determine Minecraft version in this PR."
+            exit 1
+          fi
+          
+          OLD_MC_VERSION=$(git show ${{ github.event.pull_request.base.sha }}:"$PROPERTIES_FILE" | grep -oP "$MC_VERSION_REGEX" | cut -d'=' -f2 | tr -d '[:space:]' || true)
+
+          if [[ -z "$OLD_MC_VERSION" ]]; then
+            echo "Could not determine base Minecraft version."
+            exit 1
+          fi
+
+          echo "new_mc_version=$NEW_MC_VERSION" >> $GITHUB_OUTPUT
+          echo "old_mc_version=$OLD_MC_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Verify that maintenance branch exists for version upgrades (for merges to main)
+        if: github.base_ref == 'main'
+        run: |
+          NEW_MC_VERSION="${{ steps.vars.outputs.new_mc_version }}"
+          OLD_MC_VERSION="${{ steps.vars.outputs.old_mc_version }}"
+
+          if [[ "$NEW_MC_VERSION" != "$OLD_MC_VERSION" ]]; then
+            echo "Minecraft version change detected: $OLD_MC_VERSION -> $NEW_MC_VERSION"
+            EXPECTED_BRANCH="mc/$OLD_MC_VERSION"
+            echo "Verifying that maintenance branch '$EXPECTED_BRANCH' exists..."
+
+            if git ls-remote --exit-code --heads origin "$EXPECTED_BRANCH"; then
+              echo "✅ Success: Maintenance branch '$EXPECTED_BRANCH' was found."
+              exit 0
+            else
+              echo "❌ Failure: The required maintenance branch '$EXPECTED_BRANCH' does not exist."
+              echo "Before merging this PR, you must create and push the maintenance branch for the previous version:"
+              echo "  git checkout main"
+              echo "  git pull"
+              echo "  git checkout -b $EXPECTED_BRANCH"
+              echo "  git push -u origin $EXPECTED_BRANCH"
+              echo "  git checkout -"
+              echo "After creating the branch, re-run this workflow."
+              exit 1
+            fi
+          else
+            echo "No Minecraft version change detected. Check not required."
+            exit 0
+          fi
+      
+      - name: Verify that Minecraft version was not changed (for merges to maintenance branches)
+        if: startsWith(github.base_ref, 'mc/')
+        run: |
+          NEW_MC_VERSION="${{ steps.vars.outputs.new_mc_version }}"
+          OLD_MC_VERSION="${{ steps.vars.outputs.old_mc_version }}"
+
+          if [[ "$NEW_MC_VERSION" != "$OLD_MC_VERSION" ]]; then
+            echo "❌ Failure: Minecraft version change detected in maintenance branch."
+            echo "You cannot change the Minecraft version in a maintenance branch."
+            exit 1
+          else
+            echo "✅ Success: No Minecraft version change detected in maintenance branch."
+            exit 0
+          fi

@@ -1,0 +1,88 @@
+name: Release Preview
+
+on:
+  pull_request:
+    branches:
+      - main
+      - 'mc/*'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  preview:
+    name: Preview Release Notes
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "lts/*"
+
+      - run: npm ci
+
+      - name: Checkout PR branch (required for semantic-release)
+        run: git checkout "origin/${{ github.head_ref }}"
+
+      - name: Generate release notes (Dry Run)
+        id: dryrun
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Run semantic-release in dry-run mode and capture all output
+          # Unset GITHUB_ACTIONS to avoid issues with semantic-release refusing to run in CI
+          output=$(unset GITHUB_ACTIONS && npx semantic-release --dry-run --no-ci --branches "${{ github.head_ref }}")
+
+          # Output the raw result for debugging
+          echo "Raw output from semantic-release:"
+          echo "$output"
+
+          if [[ $? -ne 0 ]]; then
+            echo "❌ Error generating release notes."
+            echo "$output"
+            exit 1
+          fi
+          
+          # Check if a release would be created
+          if echo "$output" | grep -q "There are no relevant changes"; then
+            notes="NO_RELEASE"
+          else
+            # Extract just the release notes section for a cleaner comment
+            notes=$(echo "$output" | awk '/Release note for version/{flag=1; next} flag')
+          fi
+          
+          # Use multiline output for the notes
+          echo "notes<<EOF" >> $GITHUB_OUTPUT
+          echo "$notes" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+      
+      - name: Generate PR body
+        id: pr_body
+        run: |
+          echo "body<<EOF" >> $GITHUB_OUTPUT
+
+          if [[ "${{ steps.dryrun.outputs.notes }}" == "NO_RELEASE" ]]; then
+            echo "No release will be created when this pull request is merged." >> $GITHUB_OUTPUT
+          else
+            echo "This pull request will trigger a new release when merged." >> $GITHUB_OUTPUT
+            echo -e "<details>\n" >> $GITHUB_OUTPUT
+            echo -e "<summary>Release notes</summary>\n" >> $GITHUB_OUTPUT
+            echo -e "${{ steps.dryrun.outputs.notes }}\n" >> $GITHUB_OUTPUT
+            echo -e "</details>\n" >> $GITHUB_OUTPUT
+          fi
+
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Post or Update PR Comment
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: release-preview
+          message: |
+            ### 🚀 Release Preview
+            ${{ steps.pr_body.outputs.body }}

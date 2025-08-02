@@ -1,0 +1,9 @@
+{
+  "private": true,
+  "description": "This file only contains dependencies for the release scripts and not the mod itself.",
+  "devDependencies": {
+    "@semantic-release/exec": "^7.1.0",
+    "semantic-release": "^24.2.7",
+    "semver": "^7.7.2"
+  }
+}
