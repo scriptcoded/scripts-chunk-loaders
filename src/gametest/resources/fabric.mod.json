@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "scl_tests",
+  "version": "0.0.0",
+  "name": "Script's Chunk Loaders Tests",
+  "environment": "*",
+  "entrypoints": {
+    "fabric-gametest": [
+      "io.nihlen.scriptschunkloaders.ScriptsChunkLoadersGameTest"
+    ]
+  }
+}

@@ -27,7 +27,30 @@ loom {
             sourceSet sourceSets.client
         }
     }
+}
 
+
+fabricApi {
+	configureTests {
+		createSourceSet = true
+		enableGameTests = true
+		enableClientGameTests = false
+		modId = "scl_tests"
+		eula = true
+	}
+}
+
+// `loom/runs` has to appear after the `fabricApi` block since it depends on
+// `sourceSets.gametest`, but `loom/splitEnvironmentSourceSets()` must be before.
+loom {
+	runs {
+		gameTestClient {
+			inherit client
+
+			configName = "GameTest Minecraft Client"
+			source = sourceSets.gametest
+		}
+	}
 }
 
 dependencies {
