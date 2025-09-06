@@ -4,7 +4,6 @@ import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.vehicle.*;
 import net.minecraft.world.TeleportTarget;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -28,9 +27,7 @@ public abstract class AbstractMinecartEntityMixin extends Entity implements Mine
 	private boolean isChunkLoader = false;
 	@Unique
 	private int particleTicker = 0;
-	@Unique
-	private final int particleInterval = 3;
-	@Unique
+    @Unique
 	private ChunkPos lastChunkPos = null;
 
 	public AbstractMinecartEntityMixin(EntityType<?> type, World world) {
@@ -62,7 +59,7 @@ public abstract class AbstractMinecartEntityMixin extends Entity implements Mine
 		if (minecartType == EntityType.CHEST_MINECART) {
 			//noinspection DataFlowIssue - We're sure this is a chest because of the if statement.
 			var entity = (ChestMinecartEntity)(Object)this;
-			var firstSlot = entity.getInventory().get(0);
+			var firstSlot = entity.getInventory().getFirst();
 
 			var hasCustomName = firstSlot.get(DataComponentTypes.CUSTOM_NAME) != null;
 			
@@ -71,21 +68,23 @@ public abstract class AbstractMinecartEntityMixin extends Entity implements Mine
 				scripts_chunk_loaders$setChunkLoaderName(name);
 				return;
 			}
-		};
+		}
 
-		scripts_chunk_loaders$setChunkLoaderName("Chunk Loader");
+        scripts_chunk_loaders$setChunkLoaderName("Chunk Loader");
 	}
 
 	public void scripts_chunk_loaders$setChunkLoaderName(String name) {
 		var nameText = Text.literal(name);
 		this.setCustomName(nameText);
-		this.setCustomNameVisible(true);
+		this.setCustomNameVisible(ScriptsChunkLoadersMod.isCustomNameVisible(getWorld()));
 	}
 
 	public void scripts_chunk_loaders$stopChunkLoader() {
 		scripts_chunk_loaders$stopChunkLoader(false);
 		this.lastChunkPos = null;
 	}
+
+    @Unique
 	public void scripts_chunk_loaders$stopChunkLoader(Boolean keepName) {
 		this.isChunkLoader = false;
 
@@ -147,7 +146,7 @@ public abstract class AbstractMinecartEntityMixin extends Entity implements Mine
 	@Unique
 	private void tickParticles() {
 		this.particleTicker += 1;
-		if (this.particleTicker >= particleInterval) {
+        if (this.particleTicker >= 3) {
 			this.particleTicker = 0;
 			this.spawnParticles();
 		}

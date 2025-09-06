@@ -13,6 +13,7 @@ import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.world.event.GameEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -61,15 +62,30 @@ public class DispenserBlockMixin {
         BlockPos blockPos = pos.offset(state.get(DispenserBlock.FACING));
         List<AbstractMinecartEntity> list = world.getEntitiesByClass(AbstractMinecartEntity.class, new Box(blockPos), EntityPredicates.VALID_ENTITY);
 
+        boolean stoppedLoader = false;
+        boolean startedLoader = false;
+
         for (AbstractMinecartEntity entity : list) {
             MinecartEntityExt cart = (MinecartEntityExt)entity;
 
             if (cart.scripts_chunk_loaders$isChunkLoader()) {
                 cart.scripts_chunk_loaders$stopChunkLoader();
+
+                stoppedLoader = true;
             } else {
                 cart.scripts_chunk_loaders$startChunkLoader();
                 cart.scripts_chunk_loaders$setChunkLoaderNameFromInventory();
+
+                startedLoader = true;
             }
+        }
+
+        if (startedLoader) {
+            world.emitGameEvent(GameEvent.RESONATE_6, pos, GameEvent.Emitter.of(state));
+        }
+
+        if (stoppedLoader) {
+            world.emitGameEvent(GameEvent.RESONATE_5, pos, GameEvent.Emitter.of(state));
         }
     }
 }
