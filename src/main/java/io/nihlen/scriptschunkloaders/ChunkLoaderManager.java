@@ -44,19 +44,19 @@ public class ChunkLoaderManager {
         var chunkPos = entity.getChunkPos();
 
         removeChunkLoader(entity);
-        ScriptsChunkLoadersMod.LOGGER.info("Adding {} to {}", entity, entity.getWorld().getRegistryKey().getValue());
+        ScriptsChunkLoadersMod.LOGGER.info("Adding {} to {}", entity, entity.getEntityWorld().getRegistryKey().getValue());
 
-        var worldRegistryKey = entity.getWorld().getRegistryKey();
+        var worldRegistryKey = entity.getEntityWorld().getRegistryKey();
         var worldChunks = forceLoadedChunks.computeIfAbsent(worldRegistryKey, s -> new HashMap<>());
         var list = worldChunks.computeIfAbsent(chunkPos.toLong(), s -> new ArrayList<>());
         list.add(entity.getUuid());
     }
 
     public void removeChunkLoader(Entity entity) {
-        ScriptsChunkLoadersMod.LOGGER.info("Removing {} from {}", entity, entity.getWorld().getRegistryKey().getValue());
+        ScriptsChunkLoadersMod.LOGGER.info("Removing {} from {}", entity, entity.getEntityWorld().getRegistryKey().getValue());
         var uuid = entity.getUuid();
 
-        var worldRegistryKey = entity.getWorld().getRegistryKey();
+        var worldRegistryKey = entity.getEntityWorld().getRegistryKey();
         var worldChunks = forceLoadedChunks.get(worldRegistryKey);
 
         ScriptsChunkLoadersMod.LOGGER.info("worldChunks {}", worldChunks);

@@ -2,6 +2,8 @@ package io.nihlen.scriptschunkloaders.mixin;
 
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.vehicle.*;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.world.TeleportTarget;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -49,11 +51,11 @@ public abstract class AbstractMinecartEntityMixin extends Entity implements Mine
 	}
 
 	public void scripts_chunk_loaders$startChunkLoader() {
-		if (this.getWorld().isClient) return;
+		if (this.getEntityWorld().isClient()) return;
 
 		this.isChunkLoader = true;
 
-		ScriptsChunkLoadersMod.LOGGER.info("Starting chunk loader in {}", this.getWorld().getRegistryKey().getValue());
+		ScriptsChunkLoadersMod.LOGGER.info("Starting chunk loader in {}", this.getEntityWorld().getRegistryKey().getValue());
 	}
 
 	public void scripts_chunk_loaders$setChunkLoaderNameFromInventory() {
@@ -86,6 +88,7 @@ public abstract class AbstractMinecartEntityMixin extends Entity implements Mine
 		scripts_chunk_loaders$stopChunkLoader(false);
 		this.lastChunkPos = null;
 	}
+	@Unique
 	public void scripts_chunk_loaders$stopChunkLoader(Boolean keepName) {
 		this.isChunkLoader = false;
 
@@ -97,14 +100,14 @@ public abstract class AbstractMinecartEntityMixin extends Entity implements Mine
 		}
 	}
 
-	@Inject(method = "writeCustomDataToNbt", at = @At("RETURN"))
-	public void writeCustomDataToNbt(NbtCompound nbt, CallbackInfo ci) {
-		nbt.putBoolean("chunkLoader", this.isChunkLoader);
+	@Inject(method = "writeCustomData", at = @At("RETURN"))
+	public void writeCustomData(WriteView view, CallbackInfo ci) {
+		view.putBoolean("chunkLoader", this.isChunkLoader);
 	}
 
-	@Inject(method = "readCustomDataFromNbt", at = @At("RETURN"))
-	public void readCustomDataFromNbt(NbtCompound nbt, CallbackInfo ci) {
-		this.isChunkLoader = nbt.getBoolean("chunkLoader").orElse(false);
+	@Inject(method = "readCustomData", at = @At("RETURN"))
+	public void readCustomData(ReadView view, CallbackInfo ci) {
+		this.isChunkLoader = view.getBoolean("chunkLoader", false);
 	}
 
 	@Inject(method = "tick", at = @At("TAIL"))
@@ -156,7 +159,7 @@ public abstract class AbstractMinecartEntityMixin extends Entity implements Mine
 	@Unique
 	private void spawnParticles() {
 		AbstractMinecartEntity entity = (AbstractMinecartEntity)(Object)this;
-		ServerWorld world = (ServerWorld)entity.getWorld();
+		ServerWorld world = (ServerWorld)entity.getEntityWorld();
 		world.spawnParticles(ParticleTypes.HAPPY_VILLAGER, entity.getX(), entity.getY(), entity.getZ(), 1, 0.25, 0.25, 0.25, 0.15f);
 	}
 }
