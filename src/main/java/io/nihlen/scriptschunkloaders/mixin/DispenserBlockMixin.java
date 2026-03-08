@@ -13,7 +13,10 @@ import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import org.slf4j.Logger;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -23,6 +26,8 @@ import java.util.List;
 
 @Mixin(DispenserBlock.class)
 public class DispenserBlockMixin {
+    @Shadow @Final private static Logger LOGGER;
+
     @Inject(
             at = @At("HEAD"),
             method = "dispense(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;)V",
@@ -30,46 +35,98 @@ public class DispenserBlockMixin {
     )
 
     private void dispense(ServerWorld world, BlockState state, BlockPos pos, CallbackInfo info) {
-        if (world.isClient) return;
+        if (world.isClient()) return;
 
         DispenserBlockEntity dispenserBlockEntity = world.getBlockEntity(pos, BlockEntityType.DISPENSER).orElse(null);
         if (dispenserBlockEntity == null) return;
 
-        // This can't be a property because the items aren't registered when we try to access them. The constructor is
-        // also too early because it's called before Minecraft is even fully loaded. I don't know if there is a good
-        // "on block created in world" or "after item registrations" event or similar that we can hook into. So for now
-        // it will have to be defined here.
-        Item[] pattern = {
-                Items.AIR,            Items.AMETHYST_SHARD, Items.AIR,
-                Items.AMETHYST_SHARD, Items.GLOWSTONE,      Items.AMETHYST_SHARD,
-                Items.AIR,            Items.AMETHYST_SHARD, Items.AIR
-        };
+        String action = this.getAction(dispenserBlockEntity);
+        if (action == null) return;
 
-        for (int i = 0; i < 9; i++) {
-            ItemStack itemStack = dispenserBlockEntity.getStack(i);
-            if (!itemStack.isOf(pattern[i])) {
-                return ;
-            }
-        }
+        this.applyChunkLoaderAction(world, state, pos, action);
 
-        this.toggleMinecraftChunkLoader(world, state, pos);
         info.cancel();
     }
 
     @Unique
-    private void toggleMinecraftChunkLoader(ServerWorld world, BlockState state, BlockPos pos) {
+    private String getAction(DispenserBlockEntity dispenserBlockEntity) {
+        // This can't be a property because the items aren't registered when we try to access them. The constructor is
+        // also too early because it's called before Minecraft is even fully loaded. I don't know if there is a good
+        // "on block created in world" or "after item registrations" event or similar that we can hook into. So for now
+        // it will have to be defined here.
+        Item toggleItem = Items.GLOWSTONE;
+        Item startItem = Items.SHROOMLIGHT;
+        Item stopItem = Items.MAGMA_BLOCK;
+
+        if (this.patternMatches(dispenserBlockEntity, this.getPattern(toggleItem))) {
+            return "toggle";
+        }
+
+        if (this.patternMatches(dispenserBlockEntity, this.getPattern(startItem))) {
+            return "start";
+        }
+
+        if (this.patternMatches(dispenserBlockEntity, this.getPattern(stopItem))) {
+            return "stop";
+        }
+
+        return null;
+    }
+
+    @Unique
+    private Item[] getPattern(Item centerItem) {
+        return new Item[]{
+                Items.AIR,            Items.AMETHYST_SHARD, Items.AIR,
+                Items.AMETHYST_SHARD, centerItem,           Items.AMETHYST_SHARD,
+                Items.AIR,            Items.AMETHYST_SHARD, Items.AIR
+        };
+    }
+
+    @Unique
+    private boolean patternMatches(DispenserBlockEntity dispenserBlockEntity, Item[] pattern) {
+        for (int i = 0; i < 9; i++) {
+            ItemStack itemStack = dispenserBlockEntity.getStack(i);
+            if (!itemStack.isOf(pattern[i])) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    @Unique
+    private void applyChunkLoaderAction(ServerWorld world, BlockState state, BlockPos pos, String action) {
         BlockPos blockPos = pos.offset(state.get(DispenserBlock.FACING));
         List<AbstractMinecartEntity> list = world.getEntitiesByClass(AbstractMinecartEntity.class, new Box(blockPos), EntityPredicates.VALID_ENTITY);
 
         for (AbstractMinecartEntity entity : list) {
             MinecartEntityExt cart = (MinecartEntityExt)entity;
 
-            if (cart.scripts_chunk_loaders$isChunkLoader()) {
-                cart.scripts_chunk_loaders$stopChunkLoader();
-            } else {
-                cart.scripts_chunk_loaders$startChunkLoader();
-                cart.scripts_chunk_loaders$setChunkLoaderNameFromInventory();
+            switch (action) {
+                case "toggle" -> this.toggleCart(cart);
+                case "start" -> this.startCart(cart);
+                case "stop" -> this.stopCart(cart);
             }
         }
+    }
+
+    @Unique
+    private void toggleCart(MinecartEntityExt cart) {
+        if (cart.scripts_chunk_loaders$isChunkLoader()) {
+            this.stopCart(cart);
+        } else {
+            this.startCart(cart);
+        }
+    }
+
+    @Unique
+    private void startCart(MinecartEntityExt cart) {
+        cart.scripts_chunk_loaders$startChunkLoader();
+        cart.scripts_chunk_loaders$setChunkLoaderNameFromInventory();
+    }
+
+    @Unique
+    private void stopCart(MinecartEntityExt cart) {
+        cart.scripts_chunk_loaders$stopChunkLoader();
     }
 }
