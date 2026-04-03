@@ -1,18 +1,18 @@
 package io.nihlen.scriptschunkloaders.mixin;
 
 import io.nihlen.scriptschunkloaders.MinecartEntityExt;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.DispenserBlock;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.block.entity.DispenserBlockEntity;
-import net.minecraft.entity.vehicle.AbstractMinecartEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.predicate.entity.EntityPredicates;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.DispenserBlock;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.entity.DispenserBlockEntity;
+import net.minecraft.world.entity.vehicle.minecart.AbstractMinecart;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.entity.EntitySelector;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.AABB;
 import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -30,12 +30,12 @@ public class DispenserBlockMixin {
 
     @Inject(
             at = @At("HEAD"),
-            method = "dispense(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;)V",
+            method = "dispenseFrom(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;)V",
             cancellable = true
     )
 
-    private void dispense(ServerWorld world, BlockState state, BlockPos pos, CallbackInfo info) {
-        if (world.isClient()) return;
+    private void dispense(ServerLevel world, BlockState state, BlockPos pos, CallbackInfo info) {
+        if (world.isClientSide()) return;
 
         DispenserBlockEntity dispenserBlockEntity = world.getBlockEntity(pos, BlockEntityType.DISPENSER).orElse(null);
         if (dispenserBlockEntity == null) return;
@@ -85,8 +85,8 @@ public class DispenserBlockMixin {
     @Unique
     private boolean patternMatches(DispenserBlockEntity dispenserBlockEntity, Item[] pattern) {
         for (int i = 0; i < 9; i++) {
-            ItemStack itemStack = dispenserBlockEntity.getStack(i);
-            if (!itemStack.isOf(pattern[i])) {
+            ItemStack itemStack = dispenserBlockEntity.getItem(i);
+            if (!itemStack.is(pattern[i])) {
                 return false;
             }
         }
@@ -95,11 +95,11 @@ public class DispenserBlockMixin {
     }
 
     @Unique
-    private void applyChunkLoaderAction(ServerWorld world, BlockState state, BlockPos pos, String action) {
-        BlockPos blockPos = pos.offset(state.get(DispenserBlock.FACING));
-        List<AbstractMinecartEntity> list = world.getEntitiesByClass(AbstractMinecartEntity.class, new Box(blockPos), EntityPredicates.VALID_ENTITY);
+    private void applyChunkLoaderAction(ServerLevel world, BlockState state, BlockPos pos, String action) {
+        BlockPos blockPos = pos.relative(state.getValue(DispenserBlock.FACING));
+        List<AbstractMinecart> list = world.getEntitiesOfClass(AbstractMinecart.class, new AABB(blockPos), EntitySelector.ENTITY_STILL_ALIVE);
 
-        for (AbstractMinecartEntity entity : list) {
+        for (AbstractMinecart entity : list) {
             MinecartEntityExt cart = (MinecartEntityExt)entity;
 
             switch (action) {
