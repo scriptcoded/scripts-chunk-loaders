@@ -2,14 +2,14 @@ package io.nihlen.scriptschunkloaders;
 
 import net.fabricmc.fabric.api.gametest.v1.GameTest;
 
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.test.TestContext;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.network.chat.Component;
+import net.minecraft.core.BlockPos;
 
 import java.util.Objects;
 import java.util.function.Function;
@@ -54,7 +54,7 @@ public class ScriptsChunkLoadersGameTest {
 
     private ItemStack createNamedItem() {
         ItemStack item = new ItemStack(Items.PAPER);
-        item.set(DataComponentTypes.CUSTOM_NAME, Text.literal(customItemName));
+        item.set(DataComponents.CUSTOM_NAME, Component.literal(customItemName));
         return item;
     }
 
@@ -62,109 +62,109 @@ public class ScriptsChunkLoadersGameTest {
         return new ItemStack(Items.EMERALD);
     }
 
-    private void clearTest(TestContext context) {
+    private void clearTest(GameTestHelper context) {
         context.killAllEntities();
     }
 
     @GameTest(structure = "scl_tests:basic")
-    public void registersWithDefaultName_minecart(TestContext context) {
+    public void registersWithDefaultName_minecart(GameTestHelper context) {
         clearTest(context);
 
-        context.spawnEntity(EntityType.MINECART, 2, 1, 2);
-        context.putAndRemoveRedstoneBlock(new BlockPos(1, 1, 1), 1);
-        context.waitAndRun(4, () -> {
-            context.expectEntityWithData(
+        context.spawn(EntityType.MINECART, 2, 1, 2);
+        context.pulseRedstone(new BlockPos(1, 1, 1), 1);
+        context.runAfterDelay(4, () -> {
+            context.assertEntityData(
                     new BlockPos(2, 1, 2),
                     EntityType.MINECART,
                     getCustomName,
                     defaultName
             );
-            context.complete();
+            context.succeed();
         });
     }
 
     @GameTest(structure = "scl_tests:basic")
-    public void registersWithDefaultName_hopperMinecart(TestContext context) {
+    public void registersWithDefaultName_hopperMinecart(GameTestHelper context) {
         clearTest(context);
 
-        context.spawnEntity(EntityType.HOPPER_MINECART, 2, 1, 2);
-        context.putAndRemoveRedstoneBlock(new BlockPos(1, 1, 1), 1);
-        context.waitAndRun(4, () -> {
-            context.expectEntityWithData(
+        context.spawn(EntityType.HOPPER_MINECART, 2, 1, 2);
+        context.pulseRedstone(new BlockPos(1, 1, 1), 1);
+        context.runAfterDelay(4, () -> {
+            context.assertEntityData(
                     new BlockPos(2, 1, 2),
                     EntityType.HOPPER_MINECART,
                     getCustomName,
                     defaultName
             );
-            context.complete();
+            context.succeed();
         });
     }
 
     @GameTest(structure = "scl_tests:basic")
-    public void registersWithDefaultName_chestMinecart(TestContext context) {
+    public void registersWithDefaultName_chestMinecart(GameTestHelper context) {
         clearTest(context);
 
-        context.spawnEntity(EntityType.CHEST_MINECART, 2, 1, 2);
-        context.putAndRemoveRedstoneBlock(new BlockPos(1, 1, 1), 1);
-        context.waitAndRun(4, () -> {
-            context.expectEntityWithData(
+        context.spawn(EntityType.CHEST_MINECART, 2, 1, 2);
+        context.pulseRedstone(new BlockPos(1, 1, 1), 1);
+        context.runAfterDelay(4, () -> {
+            context.assertEntityData(
                     new BlockPos(2, 1, 2),
                     EntityType.CHEST_MINECART,
                     getCustomName,
                     defaultName
             );
-            context.complete();
+            context.succeed();
         });
     }
 
     @GameTest(structure = "scl_tests:basic")
-    public void registersWithDefaultName_furnaceMinecart(TestContext context) {
+    public void registersWithDefaultName_furnaceMinecart(GameTestHelper context) {
         clearTest(context);
 
-        context.spawnEntity(EntityType.FURNACE_MINECART, 2, 1, 2);
-        context.putAndRemoveRedstoneBlock(new BlockPos(1, 1, 1), 1);
-        context.waitAndRun(4, () -> {
-            context.expectEntityWithData(
+        context.spawn(EntityType.FURNACE_MINECART, 2, 1, 2);
+        context.pulseRedstone(new BlockPos(1, 1, 1), 1);
+        context.runAfterDelay(4, () -> {
+            context.assertEntityData(
                     new BlockPos(2, 1, 2),
                     EntityType.FURNACE_MINECART,
                     getCustomName,
                     defaultName
             );
-            context.complete();
+            context.succeed();
         });
     }
 
     @GameTest(structure = "scl_tests:basic")
-    public void registersWithDefaultName_tntMinecart(TestContext context) {
+    public void registersWithDefaultName_tntMinecart(GameTestHelper context) {
         clearTest(context);
 
-        context.spawnEntity(EntityType.TNT_MINECART, 2, 1, 2);
-        context.putAndRemoveRedstoneBlock(new BlockPos(1, 1, 1), 1);
-        context.waitAndRun(4, () -> {
-            context.expectEntityWithData(
+        context.spawn(EntityType.TNT_MINECART, 2, 1, 2);
+        context.pulseRedstone(new BlockPos(1, 1, 1), 1);
+        context.runAfterDelay(4, () -> {
+            context.assertEntityData(
                     new BlockPos(2, 1, 2),
                     EntityType.TNT_MINECART,
                     getCustomName,
                     defaultName
             );
-            context.complete();
+            context.succeed();
         });
     }
 
     @GameTest(structure = "scl_tests:basic")
-    public void registersWithDefaultName_commandBlockMinecart(TestContext context) {
+    public void registersWithDefaultName_commandBlockMinecart(GameTestHelper context) {
         clearTest(context);
 
-        context.spawnEntity(EntityType.COMMAND_BLOCK_MINECART, 2, 1, 2);
-        context.putAndRemoveRedstoneBlock(new BlockPos(1, 1, 1), 1);
-        context.waitAndRun(4, () -> {
-            context.expectEntityWithData(
+        context.spawn(EntityType.COMMAND_BLOCK_MINECART, 2, 1, 2);
+        context.pulseRedstone(new BlockPos(1, 1, 1), 1);
+        context.runAfterDelay(4, () -> {
+            context.assertEntityData(
                     new BlockPos(2, 1, 2),
                     EntityType.COMMAND_BLOCK_MINECART,
                     getCustomName,
                     defaultName
             );
-            context.complete();
+            context.succeed();
         });
     }
 
@@ -190,121 +190,121 @@ public class ScriptsChunkLoadersGameTest {
 //    }
 
     @GameTest(structure = "scl_tests:basic")
-    public void registersWithFirstItemName_chestMinecart(TestContext context) {
+    public void registersWithFirstItemName_chestMinecart(GameTestHelper context) {
         clearTest(context);
 
         context.killAllEntities();
-        var entity = context.spawnEntity(EntityType.CHEST_MINECART, 2, 1, 2);
-        entity.setInventoryStack(0, createNamedItem());
+        var entity = context.spawn(EntityType.CHEST_MINECART, 2, 1, 2);
+        entity.setChestVehicleItem(0, createNamedItem());
 
-        context.putAndRemoveRedstoneBlock(new BlockPos(1, 1, 1), 1);
-        context.waitAndRun(4, () -> {
-            context.expectEntityWithData(
+        context.pulseRedstone(new BlockPos(1, 1, 1), 1);
+        context.runAfterDelay(4, () -> {
+            context.assertEntityData(
                     new BlockPos(2, 1, 2),
                     EntityType.CHEST_MINECART,
                     getCustomName,
                     customItemName
             );
-            context.complete();
+            context.succeed();
         });
     }
 
     @GameTest(structure = "scl_tests:basic")
-    public void registersWithDefaultNameOtherSlot_hopperMinecart(TestContext context) {
+    public void registersWithDefaultNameOtherSlot_hopperMinecart(GameTestHelper context) {
         clearTest(context);
 
         context.killAllEntities();
-        var entity = context.spawnEntity(EntityType.HOPPER_MINECART, 2, 1, 2);
-        entity.setInventoryStack(1, createNamedItem());
+        var entity = context.spawn(EntityType.HOPPER_MINECART, 2, 1, 2);
+        entity.setChestVehicleItem(1, createNamedItem());
 
-        context.putAndRemoveRedstoneBlock(new BlockPos(1, 1, 1), 1);
-        context.waitAndRun(4, () -> {
-            context.expectEntityWithData(
+        context.pulseRedstone(new BlockPos(1, 1, 1), 1);
+        context.runAfterDelay(4, () -> {
+            context.assertEntityData(
                     new BlockPos(2, 1, 2),
                     EntityType.HOPPER_MINECART,
                     getCustomName,
                     defaultName
             );
-            context.complete();
+            context.succeed();
         });
     }
 
     @GameTest(structure = "scl_tests:basic")
-    public void registersWithDefaultNameOtherSlot_chestMinecart(TestContext context) {
+    public void registersWithDefaultNameOtherSlot_chestMinecart(GameTestHelper context) {
         clearTest(context);
 
         context.killAllEntities();
-        var entity = context.spawnEntity(EntityType.CHEST_MINECART, 2, 1, 2);
-        entity.setInventoryStack(1, createNamedItem());
+        var entity = context.spawn(EntityType.CHEST_MINECART, 2, 1, 2);
+        entity.setChestVehicleItem(1, createNamedItem());
 
-        context.putAndRemoveRedstoneBlock(new BlockPos(1, 1, 1), 1);
-        context.waitAndRun(4, () -> {
-            context.expectEntityWithData(
+        context.pulseRedstone(new BlockPos(1, 1, 1), 1);
+        context.runAfterDelay(4, () -> {
+            context.assertEntityData(
                     new BlockPos(2, 1, 2),
                     EntityType.CHEST_MINECART,
                     getCustomName,
                     defaultName
             );
-            context.complete();
+            context.succeed();
         });
     }
 
     @GameTest(structure = "scl_tests:basic")
-    public void registersWithDefaultNameUnnamedItem_hopperMinecart(TestContext context) {
+    public void registersWithDefaultNameUnnamedItem_hopperMinecart(GameTestHelper context) {
         clearTest(context);
 
         context.killAllEntities();
-        var entity = context.spawnEntity(EntityType.HOPPER_MINECART, 2, 1, 2);
-        entity.setInventoryStack(0, createUnnamedItem());
+        var entity = context.spawn(EntityType.HOPPER_MINECART, 2, 1, 2);
+        entity.setChestVehicleItem(0, createUnnamedItem());
 
-        context.putAndRemoveRedstoneBlock(new BlockPos(1, 1, 1), 1);
-        context.waitAndRun(4, () -> {
-            context.expectEntityWithData(
+        context.pulseRedstone(new BlockPos(1, 1, 1), 1);
+        context.runAfterDelay(4, () -> {
+            context.assertEntityData(
                     new BlockPos(2, 1, 2),
                     EntityType.HOPPER_MINECART,
                     getCustomName,
                     defaultName
             );
-            context.complete();
+            context.succeed();
         });
     }
 
     @GameTest(structure = "scl_tests:basic")
-    public void registersWithDefaultNameUnnamedItem_chestMinecart(TestContext context) {
+    public void registersWithDefaultNameUnnamedItem_chestMinecart(GameTestHelper context) {
         clearTest(context);
 
         context.killAllEntities();
-        var entity = context.spawnEntity(EntityType.CHEST_MINECART, 2, 1, 2);
-        entity.setInventoryStack(0, createUnnamedItem());
+        var entity = context.spawn(EntityType.CHEST_MINECART, 2, 1, 2);
+        entity.setChestVehicleItem(0, createUnnamedItem());
 
-        context.putAndRemoveRedstoneBlock(new BlockPos(1, 1, 1), 1);
-        context.waitAndRun(4, () -> {
-            context.expectEntityWithData(
+        context.pulseRedstone(new BlockPos(1, 1, 1), 1);
+        context.runAfterDelay(4, () -> {
+            context.assertEntityData(
                     new BlockPos(2, 1, 2),
                     EntityType.CHEST_MINECART,
                     getCustomName,
                     defaultName
             );
-            context.complete();
+            context.succeed();
         });
     }
 
     @GameTest(structure = "scl_tests:basic")
-    public void registers_and_unregisters(TestContext context) {
+    public void registers_and_unregisters(GameTestHelper context) {
         clearTest(context);
 
-        context.spawnEntity(EntityType.MINECART, 2, 1, 2);
-        context.putAndRemoveRedstoneBlock(new BlockPos(1, 1, 1), 1);
+        context.spawn(EntityType.MINECART, 2, 1, 2);
+        context.pulseRedstone(new BlockPos(1, 1, 1), 1);
         
-        context.waitAndRun(4, () -> {
-            context.expectEntityWithData(new BlockPos(2, 1, 2), EntityType.MINECART, getCustomName, defaultName);
+        context.runAfterDelay(4, () -> {
+            context.assertEntityData(new BlockPos(2, 1, 2), EntityType.MINECART, getCustomName, defaultName);
 
-            context.waitAndRun(4, () -> {
-                context.putAndRemoveRedstoneBlock(new BlockPos(1, 1, 1), 1);
+            context.runAfterDelay(4, () -> {
+                context.pulseRedstone(new BlockPos(1, 1, 1), 1);
 
-                context.waitAndRun(4, () -> {
-                    context.expectEntityWithData(new BlockPos(2, 1, 2), EntityType.MINECART, getCustomName, null);
-                    context.complete();
+                context.runAfterDelay(4, () -> {
+                    context.assertEntityData(new BlockPos(2, 1, 2), EntityType.MINECART, getCustomName, null);
+                    context.succeed();
                 });
             });
         });
@@ -314,41 +314,41 @@ public class ScriptsChunkLoadersGameTest {
      * Covers <a href="https://github.com/scriptcoded/scripts-chunk-loaders/issues/34">#34</a>
      */
     @GameTest(structure = "scl_tests:basic")
-    public void registers_unregisters_and_registers(TestContext context) {
+    public void registers_unregisters_and_registers(GameTestHelper context) {
         clearTest(context);
 
-        context.spawnEntity(EntityType.MINECART, 2, 1, 2);
-        context.putAndRemoveRedstoneBlock(new BlockPos(1, 1, 1), 1);
-        context.waitAndRun(4, () -> {
-            context.expectEntityWithData(new BlockPos(2, 1, 2), EntityType.MINECART, getCustomName, defaultName);
-            context.putAndRemoveRedstoneBlock(new BlockPos(1, 1, 1), 1);
+        context.spawn(EntityType.MINECART, 2, 1, 2);
+        context.pulseRedstone(new BlockPos(1, 1, 1), 1);
+        context.runAfterDelay(4, () -> {
+            context.assertEntityData(new BlockPos(2, 1, 2), EntityType.MINECART, getCustomName, defaultName);
+            context.pulseRedstone(new BlockPos(1, 1, 1), 1);
 
-            context.waitAndRun(4, () -> {
-                context.expectEntityWithData(new BlockPos(2, 1, 2), EntityType.MINECART, getCustomName, null);
-                context.putAndRemoveRedstoneBlock(new BlockPos(1, 1, 1), 1);
+            context.runAfterDelay(4, () -> {
+                context.assertEntityData(new BlockPos(2, 1, 2), EntityType.MINECART, getCustomName, null);
+                context.pulseRedstone(new BlockPos(1, 1, 1), 1);
 
-                context.waitAndRun(4, () -> {
-                    context.expectEntityWithData(new BlockPos(2, 1, 2), EntityType.MINECART, getCustomName, defaultName);
-                    context.complete();
+                context.runAfterDelay(4, () -> {
+                    context.assertEntityData(new BlockPos(2, 1, 2), EntityType.MINECART, getCustomName, defaultName);
+                    context.succeed();
                 });
             });
         });
     }
 
     @GameTest(structure = "scl_tests:empty")
-    public void doesNotRegisterWithEmptyDispenser(TestContext context) {
+    public void doesNotRegisterWithEmptyDispenser(GameTestHelper context) {
         clearTest(context);
 
-        context.spawnEntity(EntityType.MINECART, 2, 1, 2);
-        context.putAndRemoveRedstoneBlock(new BlockPos(1, 1, 1), 1);
-        context.waitAndRun(4, () -> {
-            context.expectEntityWithData(
+        context.spawn(EntityType.MINECART, 2, 1, 2);
+        context.pulseRedstone(new BlockPos(1, 1, 1), 1);
+        context.runAfterDelay(4, () -> {
+            context.assertEntityData(
                     new BlockPos(2, 1, 2),
                     EntityType.MINECART,
                     getCustomName,
                     null
             );
-            context.complete();
+            context.succeed();
         });
     }
 }
