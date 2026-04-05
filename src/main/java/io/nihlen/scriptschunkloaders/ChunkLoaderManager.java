@@ -2,6 +2,8 @@ package io.nihlen.scriptschunkloaders;
 
 import it.unimi.dsi.fastutil.longs.LongSet;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.minecraft.server.level.ChunkMap;
+import net.minecraft.server.level.Ticket;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
@@ -104,7 +106,8 @@ public class ChunkLoaderManager {
 
             if (!loadedChunks.contains(longPos)) {
                 // Load chunk
-                world.setChunkForced(chunkPos.x(), chunkPos.z(), true);
+                var ticket = new Ticket(ScriptsChunkLoadersMod.CUSTOM_TICKETTYPE_FORCED, ChunkMap.FORCED_TICKET_LEVEL);
+                world.getChunkSource().addTicket(ticket, chunkPos);
             }
         });
 
@@ -112,7 +115,7 @@ public class ChunkLoaderManager {
             var chunkPos = ChunkPos.unpack(longPos);
             if (!currentChunks.contains(chunkPos)) {
                 // Unload chunk
-                world.setChunkForced(chunkPos.x(), chunkPos.z(), false);
+                world.getChunkSource().removeTicketWithRadius(ScriptsChunkLoadersMod.CUSTOM_TICKETTYPE_FORCED, chunkPos, 2);
             }
         });
     }
