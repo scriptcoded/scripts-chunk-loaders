@@ -57,7 +57,7 @@ public abstract class AbstractMinecartMixin extends Entity implements MinecartEn
 
 		this.isChunkLoader = true;
 
-		ScriptsChunkLoadersMod.LOGGER.info("Starting chunk loader in {}", this.level().dimension().identifier());
+		ScriptsChunkLoadersMod.LOGGER.info("Starting chunk loader (ID: {}) at ({}, {}, {}) in {}", this.getId(), (int) this.getX(), (int) this.getY(), (int) this.getZ(), this.level().dimension().identifier());
 	}
 
 	public void scripts_chunk_loaders$setChunkLoaderNameFromInventory() {
@@ -92,6 +92,7 @@ public abstract class AbstractMinecartMixin extends Entity implements MinecartEn
 	}
 	@Unique
 	public void scripts_chunk_loaders$stopChunkLoader(Boolean keepName) {
+		ScriptsChunkLoadersMod.LOGGER.info("Stopping chunk loader '{}' (ID: {}) at ({}, {}, {}) in {}", this.getName().getString(), this.getId(), (int) this.getX(), (int) this.getY(), (int) this.getZ(), this.level().dimension().identifier());
 		this.isChunkLoader = false;
 
 		ScriptsChunkLoadersMod.CHUNK_LOADER_MANAGER.removeChunkLoader(this);
@@ -119,7 +120,7 @@ public abstract class AbstractMinecartMixin extends Entity implements MinecartEn
 		var chunkPos = this.chunkPosition();
 		if (lastChunkPos == null || lastChunkPos != chunkPos) {
 			lastChunkPos = chunkPos;
-			ScriptsChunkLoadersMod.LOGGER.info("Re-registering chunk loader");
+			ScriptsChunkLoadersMod.LOGGER.debug("Re-registering chunk loader");
 			ScriptsChunkLoadersMod.CHUNK_LOADER_MANAGER.registerChunkLoader(this);
 		}
 
