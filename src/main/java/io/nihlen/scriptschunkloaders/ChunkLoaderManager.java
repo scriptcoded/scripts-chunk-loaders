@@ -32,7 +32,7 @@ public class ChunkLoaderManager {
     }
 
     private void handlePendingRegistrations () {
-        ScriptsChunkLoadersMod.LOGGER.info("Handling pending registrations");
+        ScriptsChunkLoadersMod.LOGGER.debug("Handling pending registrations");
         pendingRegistrations.forEach(this::registerChunkLoader);
         pendingRegistrations.clear();
     }
@@ -46,7 +46,7 @@ public class ChunkLoaderManager {
         var chunkPos = entity.chunkPosition();
 
         removeChunkLoader(entity);
-        ScriptsChunkLoadersMod.LOGGER.info("Adding {} to {}", entity, entity.level().dimension().identifier());
+        ScriptsChunkLoadersMod.LOGGER.debug("Adding {} to {}", entity, entity.level().dimension().identifier());
 
         var worldRegistryKey = entity.level().dimension();
         var worldChunks = forceLoadedChunks.computeIfAbsent(worldRegistryKey, s -> new HashMap<>());
@@ -55,13 +55,13 @@ public class ChunkLoaderManager {
     }
 
     public void removeChunkLoader(Entity entity) {
-        ScriptsChunkLoadersMod.LOGGER.info("Removing {} from {}", entity, entity.level().dimension().identifier());
+        ScriptsChunkLoadersMod.LOGGER.debug("Removing {} from {}", entity, entity.level().dimension().identifier());
         var uuid = entity.getUUID();
 
         var worldRegistryKey = entity.level().dimension();
         var worldChunks = forceLoadedChunks.get(worldRegistryKey);
 
-        ScriptsChunkLoadersMod.LOGGER.info("worldChunks {}", worldChunks);
+        ScriptsChunkLoadersMod.LOGGER.debug("worldChunks {}", worldChunks);
         if (worldChunks == null) return;
 
         var iterator = worldChunks.entrySet().iterator();
