@@ -4,7 +4,7 @@ import net.fabricmc.fabric.api.gametest.v1.GameTest;
 
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -70,12 +70,12 @@ public class ScriptsChunkLoadersGameTest {
     public void registersWithDefaultName_minecart(GameTestHelper context) {
         clearTest(context);
 
-        context.spawn(EntityType.MINECART, 2, 1, 2);
+        context.spawn(EntityTypes.MINECART, 2, 1, 2);
         context.pulseRedstone(new BlockPos(1, 1, 1), 1);
         context.runAfterDelay(4, () -> {
             context.assertEntityData(
                     new BlockPos(2, 1, 2),
-                    EntityType.MINECART,
+                    EntityTypes.MINECART,
                     getCustomName,
                     defaultName
             );
@@ -87,12 +87,12 @@ public class ScriptsChunkLoadersGameTest {
     public void registersWithDefaultName_hopperMinecart(GameTestHelper context) {
         clearTest(context);
 
-        context.spawn(EntityType.HOPPER_MINECART, 2, 1, 2);
+        context.spawn(EntityTypes.HOPPER_MINECART, 2, 1, 2);
         context.pulseRedstone(new BlockPos(1, 1, 1), 1);
         context.runAfterDelay(4, () -> {
             context.assertEntityData(
                     new BlockPos(2, 1, 2),
-                    EntityType.HOPPER_MINECART,
+                    EntityTypes.HOPPER_MINECART,
                     getCustomName,
                     defaultName
             );
@@ -104,12 +104,12 @@ public class ScriptsChunkLoadersGameTest {
     public void registersWithDefaultName_chestMinecart(GameTestHelper context) {
         clearTest(context);
 
-        context.spawn(EntityType.CHEST_MINECART, 2, 1, 2);
+        context.spawn(EntityTypes.CHEST_MINECART, 2, 1, 2);
         context.pulseRedstone(new BlockPos(1, 1, 1), 1);
         context.runAfterDelay(4, () -> {
             context.assertEntityData(
                     new BlockPos(2, 1, 2),
-                    EntityType.CHEST_MINECART,
+                    EntityTypes.CHEST_MINECART,
                     getCustomName,
                     defaultName
             );
@@ -121,12 +121,12 @@ public class ScriptsChunkLoadersGameTest {
     public void registersWithDefaultName_furnaceMinecart(GameTestHelper context) {
         clearTest(context);
 
-        context.spawn(EntityType.FURNACE_MINECART, 2, 1, 2);
+        context.spawn(EntityTypes.FURNACE_MINECART, 2, 1, 2);
         context.pulseRedstone(new BlockPos(1, 1, 1), 1);
         context.runAfterDelay(4, () -> {
             context.assertEntityData(
                     new BlockPos(2, 1, 2),
-                    EntityType.FURNACE_MINECART,
+                    EntityTypes.FURNACE_MINECART,
                     getCustomName,
                     defaultName
             );
@@ -138,12 +138,12 @@ public class ScriptsChunkLoadersGameTest {
     public void registersWithDefaultName_tntMinecart(GameTestHelper context) {
         clearTest(context);
 
-        context.spawn(EntityType.TNT_MINECART, 2, 1, 2);
+        context.spawn(EntityTypes.TNT_MINECART, 2, 1, 2);
         context.pulseRedstone(new BlockPos(1, 1, 1), 1);
         context.runAfterDelay(4, () -> {
             context.assertEntityData(
                     new BlockPos(2, 1, 2),
-                    EntityType.TNT_MINECART,
+                    EntityTypes.TNT_MINECART,
                     getCustomName,
                     defaultName
             );
@@ -155,12 +155,12 @@ public class ScriptsChunkLoadersGameTest {
     public void registersWithDefaultName_commandBlockMinecart(GameTestHelper context) {
         clearTest(context);
 
-        context.spawn(EntityType.COMMAND_BLOCK_MINECART, 2, 1, 2);
+        context.spawn(EntityTypes.COMMAND_BLOCK_MINECART, 2, 1, 2);
         context.pulseRedstone(new BlockPos(1, 1, 1), 1);
         context.runAfterDelay(4, () -> {
             context.assertEntityData(
                     new BlockPos(2, 1, 2),
-                    EntityType.COMMAND_BLOCK_MINECART,
+                    EntityTypes.COMMAND_BLOCK_MINECART,
                     getCustomName,
                     defaultName
             );
@@ -194,14 +194,14 @@ public class ScriptsChunkLoadersGameTest {
         clearTest(context);
 
         context.killAllEntities();
-        var entity = context.spawn(EntityType.CHEST_MINECART, 2, 1, 2);
+        var entity = context.spawn(EntityTypes.CHEST_MINECART, 2, 1, 2);
         entity.setChestVehicleItem(0, createNamedItem());
 
         context.pulseRedstone(new BlockPos(1, 1, 1), 1);
         context.runAfterDelay(4, () -> {
             context.assertEntityData(
                     new BlockPos(2, 1, 2),
-                    EntityType.CHEST_MINECART,
+                    EntityTypes.CHEST_MINECART,
                     getCustomName,
                     customItemName
             );
@@ -214,14 +214,14 @@ public class ScriptsChunkLoadersGameTest {
         clearTest(context);
 
         context.killAllEntities();
-        var entity = context.spawn(EntityType.HOPPER_MINECART, 2, 1, 2);
+        var entity = context.spawn(EntityTypes.HOPPER_MINECART, 2, 1, 2);
         entity.setChestVehicleItem(1, createNamedItem());
 
         context.pulseRedstone(new BlockPos(1, 1, 1), 1);
         context.runAfterDelay(4, () -> {
             context.assertEntityData(
                     new BlockPos(2, 1, 2),
-                    EntityType.HOPPER_MINECART,
+                    EntityTypes.HOPPER_MINECART,
                     getCustomName,
                     defaultName
             );
@@ -234,14 +234,14 @@ public class ScriptsChunkLoadersGameTest {
         clearTest(context);
 
         context.killAllEntities();
-        var entity = context.spawn(EntityType.CHEST_MINECART, 2, 1, 2);
+        var entity = context.spawn(EntityTypes.CHEST_MINECART, 2, 1, 2);
         entity.setChestVehicleItem(1, createNamedItem());
 
         context.pulseRedstone(new BlockPos(1, 1, 1), 1);
         context.runAfterDelay(4, () -> {
             context.assertEntityData(
                     new BlockPos(2, 1, 2),
-                    EntityType.CHEST_MINECART,
+                    EntityTypes.CHEST_MINECART,
                     getCustomName,
                     defaultName
             );
@@ -254,14 +254,14 @@ public class ScriptsChunkLoadersGameTest {
         clearTest(context);
 
         context.killAllEntities();
-        var entity = context.spawn(EntityType.HOPPER_MINECART, 2, 1, 2);
+        var entity = context.spawn(EntityTypes.HOPPER_MINECART, 2, 1, 2);
         entity.setChestVehicleItem(0, createUnnamedItem());
 
         context.pulseRedstone(new BlockPos(1, 1, 1), 1);
         context.runAfterDelay(4, () -> {
             context.assertEntityData(
                     new BlockPos(2, 1, 2),
-                    EntityType.HOPPER_MINECART,
+                    EntityTypes.HOPPER_MINECART,
                     getCustomName,
                     defaultName
             );
@@ -274,14 +274,14 @@ public class ScriptsChunkLoadersGameTest {
         clearTest(context);
 
         context.killAllEntities();
-        var entity = context.spawn(EntityType.CHEST_MINECART, 2, 1, 2);
+        var entity = context.spawn(EntityTypes.CHEST_MINECART, 2, 1, 2);
         entity.setChestVehicleItem(0, createUnnamedItem());
 
         context.pulseRedstone(new BlockPos(1, 1, 1), 1);
         context.runAfterDelay(4, () -> {
             context.assertEntityData(
                     new BlockPos(2, 1, 2),
-                    EntityType.CHEST_MINECART,
+                    EntityTypes.CHEST_MINECART,
                     getCustomName,
                     defaultName
             );
@@ -293,17 +293,17 @@ public class ScriptsChunkLoadersGameTest {
     public void registers_and_unregisters(GameTestHelper context) {
         clearTest(context);
 
-        context.spawn(EntityType.MINECART, 2, 1, 2);
+        context.spawn(EntityTypes.MINECART, 2, 1, 2);
         context.pulseRedstone(new BlockPos(1, 1, 1), 1);
         
         context.runAfterDelay(4, () -> {
-            context.assertEntityData(new BlockPos(2, 1, 2), EntityType.MINECART, getCustomName, defaultName);
+            context.assertEntityData(new BlockPos(2, 1, 2), EntityTypes.MINECART, getCustomName, defaultName);
 
             context.runAfterDelay(4, () -> {
                 context.pulseRedstone(new BlockPos(1, 1, 1), 1);
 
                 context.runAfterDelay(4, () -> {
-                    context.assertEntityData(new BlockPos(2, 1, 2), EntityType.MINECART, getCustomName, null);
+                    context.assertEntityData(new BlockPos(2, 1, 2), EntityTypes.MINECART, getCustomName, null);
                     context.succeed();
                 });
             });
@@ -317,18 +317,18 @@ public class ScriptsChunkLoadersGameTest {
     public void registers_unregisters_and_registers(GameTestHelper context) {
         clearTest(context);
 
-        context.spawn(EntityType.MINECART, 2, 1, 2);
+        context.spawn(EntityTypes.MINECART, 2, 1, 2);
         context.pulseRedstone(new BlockPos(1, 1, 1), 1);
         context.runAfterDelay(4, () -> {
-            context.assertEntityData(new BlockPos(2, 1, 2), EntityType.MINECART, getCustomName, defaultName);
+            context.assertEntityData(new BlockPos(2, 1, 2), EntityTypes.MINECART, getCustomName, defaultName);
             context.pulseRedstone(new BlockPos(1, 1, 1), 1);
 
             context.runAfterDelay(4, () -> {
-                context.assertEntityData(new BlockPos(2, 1, 2), EntityType.MINECART, getCustomName, null);
+                context.assertEntityData(new BlockPos(2, 1, 2), EntityTypes.MINECART, getCustomName, null);
                 context.pulseRedstone(new BlockPos(1, 1, 1), 1);
 
                 context.runAfterDelay(4, () -> {
-                    context.assertEntityData(new BlockPos(2, 1, 2), EntityType.MINECART, getCustomName, defaultName);
+                    context.assertEntityData(new BlockPos(2, 1, 2), EntityTypes.MINECART, getCustomName, defaultName);
                     context.succeed();
                 });
             });
@@ -339,12 +339,12 @@ public class ScriptsChunkLoadersGameTest {
     public void doesNotRegisterWithEmptyDispenser(GameTestHelper context) {
         clearTest(context);
 
-        context.spawn(EntityType.MINECART, 2, 1, 2);
+        context.spawn(EntityTypes.MINECART, 2, 1, 2);
         context.pulseRedstone(new BlockPos(1, 1, 1), 1);
         context.runAfterDelay(4, () -> {
             context.assertEntityData(
                     new BlockPos(2, 1, 2),
-                    EntityType.MINECART,
+                    EntityTypes.MINECART,
                     getCustomName,
                     null
             );

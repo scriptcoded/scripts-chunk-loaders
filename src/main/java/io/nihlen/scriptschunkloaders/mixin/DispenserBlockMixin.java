@@ -3,7 +3,7 @@ package io.nihlen.scriptschunkloaders.mixin;
 import io.nihlen.scriptschunkloaders.MinecartEntityExt;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.DispenserBlock;
-import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.entity.BlockEntityTypes;
 import net.minecraft.world.level.block.entity.DispenserBlockEntity;
 import net.minecraft.world.entity.vehicle.minecart.AbstractMinecart;
 import net.minecraft.world.item.Item;
@@ -37,7 +37,7 @@ public class DispenserBlockMixin {
     private void dispense(ServerLevel world, BlockState state, BlockPos pos, CallbackInfo info) {
         if (world.isClientSide()) return;
 
-        DispenserBlockEntity dispenserBlockEntity = world.getBlockEntity(pos, BlockEntityType.DISPENSER).orElse(null);
+        DispenserBlockEntity dispenserBlockEntity = world.getBlockEntity(pos, BlockEntityTypes.DISPENSER).orElse(null);
         if (dispenserBlockEntity == null) return;
 
         String action = this.getAction(dispenserBlockEntity);

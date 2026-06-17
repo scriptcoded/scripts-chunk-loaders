@@ -2,6 +2,7 @@ package io.nihlen.scriptschunkloaders.mixin;
 
 import net.minecraft.core.component.DataComponents;
 //import net.minecraft.entity.vehicle.*;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.vehicle.minecart.AbstractMinecart;
 import net.minecraft.world.entity.vehicle.minecart.MinecartChest;
 import net.minecraft.world.level.storage.ValueInput;
@@ -63,7 +64,7 @@ public abstract class AbstractMinecartMixin extends Entity implements MinecartEn
 	public void scripts_chunk_loaders$setChunkLoaderNameFromInventory() {
 		EntityType<?> minecartType = this.getType();
 
-		if (minecartType == EntityType.CHEST_MINECART) {
+		if (minecartType == EntityTypes.CHEST_MINECART) {
 			//noinspection DataFlowIssue - We're sure this is a chest because of the if statement.
 			var entity = (MinecartChest)(Object)this;
 			var firstSlot = entity.getItemStacks().get(0);
