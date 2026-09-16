@@ -1,5 +1,6 @@
 package io.nihlen.scriptschunkloaders.mixin;
 
+import io.nihlen.scriptschunkloaders.ScriptsChunkLoadersGameRules;
 import net.minecraft.core.component.DataComponents;
 //import net.minecraft.entity.vehicle.*;
 import net.minecraft.world.entity.EntityTypes;
@@ -8,8 +9,8 @@ import net.minecraft.world.entity.vehicle.minecart.MinecartChest;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.level.portal.TeleportTransition;
+import org.jspecify.annotations.NonNull;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -19,7 +20,6 @@ import io.nihlen.scriptschunkloaders.ScriptsChunkLoadersMod;
 import io.nihlen.scriptschunkloaders.MinecartEntityExt;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.network.chat.Component;
@@ -33,8 +33,6 @@ public abstract class AbstractMinecartMixin extends Entity implements MinecartEn
 	private boolean isChunkLoader = false;
 	@Unique
 	private int particleTicker = 0;
-	@Unique
-	private final int particleInterval = 3;
 	@Unique
 	private ChunkPos lastChunkPos = null;
 
@@ -58,7 +56,15 @@ public abstract class AbstractMinecartMixin extends Entity implements MinecartEn
 
 		this.isChunkLoader = true;
 
-		ScriptsChunkLoadersMod.LOGGER.info("Starting chunk loader (ID: {}) at ({}, {}, {}) in {}", this.getId(), (int) this.getX(), (int) this.getY(), (int) this.getZ(), this.level().dimension().identifier());
+		ScriptsChunkLoadersMod.LOGGER.info(
+                "Starting chunk loader '{}' (ID: {}) at ({}, {}, {}) in '{}'",
+                this.getName().getString(),
+                (Object) this.getId(),
+                (Object) this.getX(),
+                (Object) this.getY(),
+                (Object) this.getZ(),
+                this.level().dimension().identifier()
+        );
 	}
 
 	public void scripts_chunk_loaders$setChunkLoaderNameFromInventory() {
@@ -67,7 +73,7 @@ public abstract class AbstractMinecartMixin extends Entity implements MinecartEn
 		if (minecartType == EntityTypes.CHEST_MINECART) {
 			//noinspection DataFlowIssue - We're sure this is a chest because of the if statement.
 			var entity = (MinecartChest)(Object)this;
-			var firstSlot = entity.getItemStacks().get(0);
+			var firstSlot = entity.getItemStacks().getFirst();
 
 			var hasCustomName = firstSlot.get(DataComponents.CUSTOM_NAME) != null;
 			
@@ -76,15 +82,15 @@ public abstract class AbstractMinecartMixin extends Entity implements MinecartEn
 				scripts_chunk_loaders$setChunkLoaderName(name);
 				return;
 			}
-		};
+		}
 
-		scripts_chunk_loaders$setChunkLoaderName("Chunk Loader");
+        scripts_chunk_loaders$setChunkLoaderName("Chunk Loader");
 	}
 
 	public void scripts_chunk_loaders$setChunkLoaderName(String name) {
 		var nameText = Component.literal(name);
 		this.setCustomName(nameText);
-		this.setCustomNameVisible(true);
+		this.setCustomNameVisible(ScriptsChunkLoadersGameRules.shouldAlwaysShowCustomName(this));
 	}
 
 	public void scripts_chunk_loaders$stopChunkLoader() {
@@ -92,8 +98,17 @@ public abstract class AbstractMinecartMixin extends Entity implements MinecartEn
 		this.lastChunkPos = null;
 	}
 	@Unique
-	public void scripts_chunk_loaders$stopChunkLoader(Boolean keepName) {
-		ScriptsChunkLoadersMod.LOGGER.info("Stopping chunk loader '{}' (ID: {}) at ({}, {}, {}) in {}", this.getName().getString(), this.getId(), (int) this.getX(), (int) this.getY(), (int) this.getZ(), this.level().dimension().identifier());
+	public void scripts_chunk_loaders$stopChunkLoader(boolean keepName) {
+		ScriptsChunkLoadersMod.LOGGER.info(
+                "Stopping chunk loader '{}' (ID: {}) at ({}, {}, {}) in '{}'",
+                this.getName().getString(),
+                (Object) this.getId(),
+                (Object) this.getX(),
+                (Object) this.getY(),
+                (Object) this.getZ(),
+                this.level().dimension().identifier()
+        );
+
 		this.isChunkLoader = false;
 
 		ScriptsChunkLoadersMod.CHUNK_LOADER_MANAGER.removeChunkLoader(this);
@@ -105,13 +120,13 @@ public abstract class AbstractMinecartMixin extends Entity implements MinecartEn
 	}
 
 	@Inject(method = "addAdditionalSaveData", at = @At("RETURN"))
-	public void writeCustomData(ValueOutput view, CallbackInfo ci) {
-		view.putBoolean("chunkLoader", this.isChunkLoader);
+	public void writeCustomData(ValueOutput output, CallbackInfo ci) {
+		output.putBoolean("chunkLoader", this.isChunkLoader);
 	}
 
 	@Inject(method = "readAdditionalSaveData", at = @At("RETURN"))
-	public void readCustomData(ValueInput view, CallbackInfo ci) {
-		this.isChunkLoader = view.getBooleanOr("chunkLoader", false);
+	public void readCustomData(ValueInput input, CallbackInfo ci) {
+		this.isChunkLoader = input.getBooleanOr("chunkLoader", false);
 	}
 
 	@Inject(method = "tick", at = @At("TAIL"))
@@ -129,7 +144,7 @@ public abstract class AbstractMinecartMixin extends Entity implements MinecartEn
 	}
 
 	@Override
-	public void remove(Entity.RemovalReason reason) {
+	public void remove(Entity.@NonNull RemovalReason reason) {
 		if (isChunkLoader) {
 			this.scripts_chunk_loaders$stopChunkLoader();
 		}
@@ -138,7 +153,7 @@ public abstract class AbstractMinecartMixin extends Entity implements MinecartEn
 	}
 
 	@Override
-	public Entity teleport(TeleportTransition teleportTarget) {
+	public Entity teleport(@NonNull TeleportTransition teleportTarget) {
 		var wasChunkLoader = isChunkLoader;
 		if (wasChunkLoader)
 			this.scripts_chunk_loaders$stopChunkLoader(true);
@@ -154,7 +169,7 @@ public abstract class AbstractMinecartMixin extends Entity implements MinecartEn
 	@Unique
 	private void tickParticles() {
 		this.particleTicker += 1;
-		if (this.particleTicker >= particleInterval) {
+		if (this.particleTicker >= 3) {
 			this.particleTicker = 0;
 			this.spawnParticles();
 		}

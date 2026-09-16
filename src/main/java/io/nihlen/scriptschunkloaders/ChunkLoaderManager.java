@@ -44,22 +44,22 @@ public class ChunkLoaderManager {
         }
 
         var chunkPos = entity.chunkPosition();
+        ResourceKey<Level> dimension = entity.level().dimension();
 
         removeChunkLoader(entity);
-        ScriptsChunkLoadersMod.LOGGER.debug("Adding {} to {}", entity, entity.level().dimension().identifier());
+        ScriptsChunkLoadersMod.LOGGER.debug("Adding {} to {}", entity, dimension.identifier());
 
-        var worldRegistryKey = entity.level().dimension();
-        var worldChunks = forceLoadedChunks.computeIfAbsent(worldRegistryKey, s -> new HashMap<>());
+        var worldChunks = forceLoadedChunks.computeIfAbsent(dimension, _ -> new HashMap<>());
         var list = worldChunks.computeIfAbsent(chunkPos.pack(), s -> new ArrayList<>());
         list.add(entity.getUUID());
     }
 
     public void removeChunkLoader(Entity entity) {
-        ScriptsChunkLoadersMod.LOGGER.debug("Removing {} from {}", entity, entity.level().dimension().identifier());
+        ResourceKey<Level> dimension = entity.level().dimension();
+        ScriptsChunkLoadersMod.LOGGER.debug("Removing {} from {}", entity, dimension.identifier());
         var uuid = entity.getUUID();
 
-        var worldRegistryKey = entity.level().dimension();
-        var worldChunks = forceLoadedChunks.get(worldRegistryKey);
+        var worldChunks = forceLoadedChunks.get(dimension);
 
         ScriptsChunkLoadersMod.LOGGER.debug("worldChunks {}", worldChunks);
         if (worldChunks == null) return;

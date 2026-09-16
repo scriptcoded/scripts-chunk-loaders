@@ -1,6 +1,7 @@
 package io.nihlen.scriptschunkloaders.mixin;
 
 import io.nihlen.scriptschunkloaders.MinecartEntityExt;
+import io.nihlen.scriptschunkloaders.ScriptsChunkLoadersGameRules;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.DispenserBlock;
 import net.minecraft.world.level.block.entity.BlockEntityTypes;
@@ -12,9 +13,8 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.AABB;
-import org.slf4j.Logger;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -26,7 +26,6 @@ import java.util.List;
 
 @Mixin(DispenserBlock.class)
 public class DispenserBlockMixin {
-    @Shadow @Final private static Logger LOGGER;
 
     @Inject(
             at = @At("HEAD"),
@@ -34,16 +33,16 @@ public class DispenserBlockMixin {
             cancellable = true
     )
 
-    private void dispense(ServerLevel world, BlockState state, BlockPos pos, CallbackInfo info) {
-        if (world.isClientSide()) return;
+    private void dispense(ServerLevel level, BlockState state, BlockPos pos, CallbackInfo info) {
+        if (level.isClientSide()) return;
 
-        DispenserBlockEntity dispenserBlockEntity = world.getBlockEntity(pos, BlockEntityTypes.DISPENSER).orElse(null);
+        DispenserBlockEntity dispenserBlockEntity = level.getBlockEntity(pos, BlockEntityTypes.DISPENSER).orElse(null);
         if (dispenserBlockEntity == null) return;
 
         String action = this.getAction(dispenserBlockEntity);
         if (action == null) return;
 
-        this.applyChunkLoaderAction(world, state, pos, action);
+        this.applyChunkLoaderAction(level, state, pos, action);
 
         info.cancel();
     }
@@ -76,9 +75,9 @@ public class DispenserBlockMixin {
     @Unique
     private Item[] getPattern(Item centerItem) {
         return new Item[]{
-                Items.AIR,            Items.AMETHYST_SHARD, Items.AIR,
-                Items.AMETHYST_SHARD, centerItem,           Items.AMETHYST_SHARD,
-                Items.AIR,            Items.AMETHYST_SHARD, Items.AIR
+                Items.AIR, Items.AMETHYST_SHARD, Items.AIR,
+                Items.AMETHYST_SHARD, centerItem, Items.AMETHYST_SHARD,
+                Items.AIR, Items.AMETHYST_SHARD, Items.AIR
         };
     }
 
@@ -95,38 +94,46 @@ public class DispenserBlockMixin {
     }
 
     @Unique
-    private void applyChunkLoaderAction(ServerLevel world, BlockState state, BlockPos pos, String action) {
+    private void applyChunkLoaderAction(ServerLevel level, BlockState state, BlockPos pos, String action) {
         BlockPos blockPos = pos.relative(state.getValue(DispenserBlock.FACING));
-        List<AbstractMinecart> list = world.getEntitiesOfClass(AbstractMinecart.class, new AABB(blockPos), EntitySelector.ENTITY_STILL_ALIVE);
+        List<AbstractMinecart> list = level.getEntitiesOfClass(AbstractMinecart.class, new AABB(blockPos), EntitySelector.ENTITY_STILL_ALIVE);
 
         for (AbstractMinecart entity : list) {
-            MinecartEntityExt cart = (MinecartEntityExt)entity;
+            MinecartEntityExt cart = (MinecartEntityExt) entity;
 
             switch (action) {
-                case "toggle" -> this.toggleCart(cart);
-                case "start" -> this.startCart(cart);
-                case "stop" -> this.stopCart(cart);
+                case "toggle" -> this.toggleCart(level, entity, cart);
+                case "start" -> this.startCart(level, entity, cart);
+                case "stop" -> this.stopCart(level, entity, cart);
             }
         }
     }
 
     @Unique
-    private void toggleCart(MinecartEntityExt cart) {
+    private void toggleCart(ServerLevel level, AbstractMinecart entity, MinecartEntityExt cart) {
         if (cart.scripts_chunk_loaders$isChunkLoader()) {
-            this.stopCart(cart);
+            this.stopCart(level, entity, cart);
         } else {
-            this.startCart(cart);
+            this.startCart(level, entity, cart);
         }
     }
 
     @Unique
-    private void startCart(MinecartEntityExt cart) {
+    private void startCart(ServerLevel level, AbstractMinecart entity, MinecartEntityExt cart) {
         cart.scripts_chunk_loaders$startChunkLoader();
         cart.scripts_chunk_loaders$setChunkLoaderNameFromInventory();
+
+        if (ScriptsChunkLoadersGameRules.shouldEmitVibration(entity)) {
+            level.gameEvent(entity, GameEvent.RESONATE_6, entity.position());
+        }
     }
 
     @Unique
-    private void stopCart(MinecartEntityExt cart) {
+    private void stopCart(ServerLevel level, AbstractMinecart entity, MinecartEntityExt cart) {
         cart.scripts_chunk_loaders$stopChunkLoader();
+
+        if (ScriptsChunkLoadersGameRules.shouldEmitVibration(entity)) {
+            level.gameEvent(entity, GameEvent.RESONATE_5, entity.position());
+        }
     }
 }

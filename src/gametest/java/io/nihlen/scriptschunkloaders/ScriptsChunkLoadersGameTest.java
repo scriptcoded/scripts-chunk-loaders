@@ -10,6 +10,8 @@ import net.minecraft.world.item.Items;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.SculkSensorBlockEntity;
 
 import java.util.Objects;
 import java.util.function.Function;
@@ -40,11 +42,17 @@ import java.util.function.Function;
 * - Minecart registers, unregisters and registers again
 *
 * - Minecart does not register with empty dispenser
+*
+* - Minecart registers with sculk sensor
+*
+* - Minecart unregisters with sculk sensor
 * */
-
+@SuppressWarnings("unused")
 public class ScriptsChunkLoadersGameTest {
     String defaultName = "Chunk Loader";
     String customItemName = "My Custom Item";
+    int startLoaderFrequency = 6;
+    int stopLoaderFrequency = 5;
 
     Function<Entity, String> getCustomName = entity -> {
         var customName = entity.getCustomName();
@@ -349,6 +357,76 @@ public class ScriptsChunkLoadersGameTest {
                     null
             );
             context.succeed();
+        });
+    }
+
+    /// Checks if the sculk sensor receives the correct vibration on activation
+    @GameTest(structure = "scl_tests:sculk_activate")
+    public void registerWithVibration(GameTestHelper context) {
+        clearTest(context);
+
+        context.spawn(EntityTypes.MINECART, 2, 1, 2);
+        context.setBlock(new BlockPos(3, 1, 2), Blocks.AIR);
+        context.pulseRedstone(new BlockPos(1, 1, 1), 1);
+
+        context.runAfterDelay(15, () -> {
+            BlockPos pos = new BlockPos( 4, 1, 2);
+            SculkSensorBlockEntity sensor = context.getBlockEntity(pos, SculkSensorBlockEntity.class);
+
+            if (sensor.getLastVibrationFrequency() != startLoaderFrequency) {
+                throw context.assertionException(pos, String.format(
+                        "Expected a vibration frequency of %s, instead got %s",
+                        (Object) startLoaderFrequency,
+                        (Object) sensor.getLastVibrationFrequency()
+                ));
+            }
+
+            context.assertEntityData(
+                    new BlockPos(2, 1, 2),
+                    EntityTypes.MINECART,
+                    getCustomName,
+                    defaultName
+            );
+            context.succeed();
+        });
+    }
+
+    /// Checks if the sculk sensor receives the correct vibration on deactivation
+    @GameTest(structure = "scl_tests:sculk_activate")
+    public void unregisterWithVibration(GameTestHelper context) {
+        clearTest(context);
+
+        context.spawn(EntityTypes.MINECART, 2, 1, 2);
+        context.pulseRedstone(new BlockPos(1, 1, 1), 1);
+
+        context.runAfterDelay(4, () -> {
+            context.assertEntityData(new BlockPos(2, 1, 2), EntityTypes.MINECART, getCustomName, defaultName);
+            context.setBlock(new BlockPos(3, 1, 2), Blocks.AIR);
+
+            context.runAfterDelay(4, () -> {
+                context.pulseRedstone(new BlockPos(1, 1, 1), 1);
+
+                context.runAfterDelay(8, () -> {
+                    BlockPos pos = new BlockPos( 4, 1, 2);
+                    SculkSensorBlockEntity sensor = context.getBlockEntity(pos, SculkSensorBlockEntity.class);
+
+                    if (sensor.getLastVibrationFrequency() != stopLoaderFrequency) {
+                        throw context.assertionException(pos, String.format(
+                                "Expected a vibration frequency of %s, instead got %s",
+                                (Object) stopLoaderFrequency,
+                                (Object) sensor.getLastVibrationFrequency()
+                        ));
+                    }
+
+                    context.assertEntityData(
+                            new BlockPos(2, 1, 2),
+                            EntityTypes.MINECART,
+                            getCustomName,
+                            null
+                    );
+                    context.succeed();
+                });
+            });
         });
     }
 }

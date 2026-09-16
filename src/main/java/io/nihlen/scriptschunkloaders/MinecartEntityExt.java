@@ -1,9 +1,9 @@
 package io.nihlen.scriptschunkloaders;
 
 public interface MinecartEntityExt {
-    public void scripts_chunk_loaders$startChunkLoader();
-    public void scripts_chunk_loaders$stopChunkLoader();
-    public boolean scripts_chunk_loaders$isChunkLoader();
-    public void scripts_chunk_loaders$setChunkLoaderNameFromInventory();
-    public void scripts_chunk_loaders$setChunkLoaderName(String name);
+    void scripts_chunk_loaders$startChunkLoader();
+    void scripts_chunk_loaders$stopChunkLoader();
+    boolean scripts_chunk_loaders$isChunkLoader();
+    void scripts_chunk_loaders$setChunkLoaderNameFromInventory();
+    void scripts_chunk_loaders$setChunkLoaderName(String name);
 }
